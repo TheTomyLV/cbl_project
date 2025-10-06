@@ -15,7 +15,7 @@ public class StaticNetworkObject extends GameObject {
     }
 
     @Override
-    public void update() {
+    public void update(float deltaTime) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }

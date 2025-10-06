@@ -1,34 +1,19 @@
 package Engine;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import javax.swing.*;
 
+/**
+ * A scene class that can be extended to act as the main game panel.
+ */
 public abstract class Scene extends JPanel {
-    // JPanel uiPanel;
-    // JPanel gamePanel;
-    // JPanel mainPanel;
     ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
 
     public Scene() {
-        // mainPanel = new JPanel();
-        // uiPanel = new JPanel();
-        // gamePanel = new JPanel();
-
         this.setLayout(null);
-        // gamePanel.setLayout(new BorderLayout());
-        // uiPanel.setLayout(null);
-        
-        // this.setBackground(Color.BLUE);
-        
         setupScene();
-        // uiPanel.setOpaque(false);
-
-        // gamePanel.add(uiPanel);
-        // mainPanel.add(gamePanel);
     }
 
     @Override
@@ -40,23 +25,14 @@ public abstract class Scene extends JPanel {
         }
     }
 
-    protected void update() {
+    void update() {
+        for (GameObject gameObject : gameObjects) {
+            gameObject.update(Engine.getDeltaTIme());
+        }
         repaint();
     }
 
     public abstract void setupScene();
-
-    // public JPanel getUiPanel() {
-    //     return this;
-    // }
-
-    // public JPanel getGamePanel() {
-    //     return this;
-    // }
-
-    protected JPanel getMainPanel() {
-        return this;
-    }
 
     public void addObject(GameObject gameObject) {
         gameObjects.add(gameObject);

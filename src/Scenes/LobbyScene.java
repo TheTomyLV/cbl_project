@@ -44,7 +44,7 @@ public class LobbyScene extends Scene {
         add(joinLobbyButton);
         add(createLobbyButton);
 
-        addObject(new Player());
+        addObject(new Player(230, 20));
     }
     
 }

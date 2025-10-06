@@ -12,10 +12,10 @@ import javax.imageio.ImageIO;
  * Abstract GameObject that exsists in scenes.
  */
 public abstract class GameObject {
-    int x = 0;
-    int y = 0;
-    float scale = 1.0f;
-    float rotation = 100.0f;
+    public float x = 0;
+    public float y = 0;
+    public float scale = 1.0f;
+    float rotation = 0.0f;
     Scene scene;
     HashMap<String, BufferedImage> images = new HashMap<String, BufferedImage>();
     BufferedImage currentImage;
@@ -41,6 +41,10 @@ public abstract class GameObject {
         }
     }
 
+    public void setRotation(float degrees) {
+        rotation = degrees;
+    }
+
     /**
      * Draws the object on game panel.
      * @param g2d the Graphics2D component of the game panel
@@ -48,31 +52,32 @@ public abstract class GameObject {
     protected void draw(Graphics2D g2d) {
         AffineTransform at = new AffineTransform();
 
+        at.translate(x, y);
         at.rotate(Math.toRadians(rotation));
         at.scale(scale, scale);
         at.translate(-currentImage.getWidth() / 2, -currentImage.getHeight() / 2);
 
-        g2d.drawImage(currentImage, x, y, null);
+        g2d.drawImage(currentImage, at, null);
     }
 
-    public abstract void setup();
+    protected abstract void setup();
 
-    public abstract void onLoad();
+    protected abstract void onLoad();
 
-    public abstract void onDestroy();
+    protected abstract void onDestroy();
 
-    public abstract void update();
+    protected abstract void update(float deltaTime);
 
     /**
      * Unsure for now, but would later use it to send objects over the network.
      * @return packed bytes
      */
-    protected byte[] pack() {
+    byte[] pack() {
         //id, x, y, size, frameId
         return new byte[0];
     }
 
-    protected void unpack(byte[] data) {
+    void unpack(byte[] data) {
         
     }
 }

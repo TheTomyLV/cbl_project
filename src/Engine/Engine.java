@@ -3,12 +3,11 @@ package Engine;
 import Engine.Networking.Client;
 import Engine.Networking.Server;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 
 
@@ -18,6 +17,8 @@ public class Engine {
     Scene currentScene;
     JFrame jFrame;
     boolean running;
+    Duration deltaTime = Duration.ZERO;
+    Instant beginTime = Instant.now();
     static Engine engine;
 
     public Engine() {
@@ -29,6 +30,8 @@ public class Engine {
         jFrame.setSize(500, 600);
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        jFrame.setTitle("Game");
+        jFrame.addKeyListener(new Input());
         running = true;
     }
 
@@ -44,18 +47,25 @@ public class Engine {
         return running;
     }
 
+    public static float getDeltaTIme() {
+        return engine.deltaTime.toMillis();
+    }
+
     public void update() {
         currentScene.update();
+
+        deltaTime = Duration.between(beginTime, Instant.now());
+        beginTime = Instant.now();
     }
 
     public static void changeScene(Scene scene) {
         if (Engine.getCurrentScene() != null) {
-            Engine.getEngine().jFrame.remove(Engine.getCurrentScene().getMainPanel());
+            Engine.getEngine().jFrame.remove(Engine.getCurrentScene());
         }
         
         Engine.getEngine().currentScene = scene;
         
-        Engine.getEngine().jFrame.add(scene.getMainPanel());
+        Engine.getEngine().jFrame.add(scene);
         Engine.getEngine().jFrame.validate();
     }
 
