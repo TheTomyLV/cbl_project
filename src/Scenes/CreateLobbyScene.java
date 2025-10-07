@@ -1,11 +1,8 @@
 package Scenes;
 
-import java.awt.event.*;
-
-import javax.swing.*;
-
 import Engine.Scene;
 import GameObjects.Player;
+import javax.swing.*;
 
 public class CreateLobbyScene extends Scene {
     

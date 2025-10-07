@@ -3,10 +3,6 @@ package Engine;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import javax.imageio.ImageIO;
 
 /**
  * Abstract GameObject that exsists in scenes.
@@ -17,7 +13,6 @@ public abstract class GameObject {
     public float scale = 1.0f;
     float rotation = 0.0f;
     Scene scene;
-    HashMap<String, BufferedImage> images = new HashMap<String, BufferedImage>();
     BufferedImage currentImage;
 
     public GameObject() {
@@ -30,15 +25,8 @@ public abstract class GameObject {
      * @param path path to the image
      */
     public void loadImage(String name, String path) {
-        try {
-            BufferedImage image = ImageIO.read(new File(path));
-            if (currentImage == null) {
-                currentImage = image;
-            }
-            images.put(name, image);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BufferedImage image = Sprite.getImage(path);
+        currentImage = image;
     }
 
     public void setRotation(float degrees) {
@@ -60,13 +48,21 @@ public abstract class GameObject {
         g2d.drawImage(currentImage, at, null);
     }
 
-    protected abstract void setup();
+    protected void setup() {
+        return;
+    }
 
-    protected abstract void onLoad();
+    protected void onLoad() {
+        return;
+    }
 
-    protected abstract void onDestroy();
+    protected void onDestroy() {
+        return;
+    }
 
-    protected abstract void update(float deltaTime);
+    protected void update(float deltaTime) {
+        return;
+    }
 
     /**
      * Unsure for now, but would later use it to send objects over the network.

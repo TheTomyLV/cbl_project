@@ -8,25 +8,15 @@ import java.util.HashMap;
  * Input class for engine.
  */
 public class Input implements KeyListener {
-    
-    /**
-     * Represents a mouse position in the window.
-     */
-    public class Mouse {
-        public int x;
-        public int y;
-    }
 
     private static HashMap<Integer, Boolean> keyMap = new HashMap<Integer, Boolean>();
-    public static Mouse mouse;
-
 
     /**
      * Check if the given key is pressed.
      * @param keyCode KeyCode
      * @return true if the given key is pressed
      */
-    public static boolean keyPressed(int keyCode) {
+    public static boolean isKeyPressed(int keyCode) {
         if (!keyMap.containsKey(keyCode)) {
             return false;
         }

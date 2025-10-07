@@ -1,12 +1,10 @@
 package Scenes;
 
-import java.awt.event.*;
-
-import javax.swing.*;
-
 import Engine.Engine;
 import Engine.Scene;
 import GameObjects.Player;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class LobbyScene extends Scene {
     

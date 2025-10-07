@@ -1,8 +1,5 @@
 import Engine.Engine;
-import Engine.Networking.Client;
-import Engine.Networking.Server;
 import Scenes.LobbyScene;
-import javax.swing.*;
 
 /**
  * Main app for the program.

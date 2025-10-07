@@ -1,10 +1,8 @@
 package GameObjects;
 
-import java.awt.MouseInfo;
-import java.awt.event.KeyEvent;
-
 import Engine.GameObject;
 import Engine.Input;
+import java.awt.event.KeyEvent;
 
 public class Player extends GameObject {
 
@@ -30,34 +28,22 @@ public class Player extends GameObject {
     }
 
     @Override
-    protected void onLoad() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onLoad'");
-    }
-
-    @Override
-    protected void onDestroy() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onDestroy'");
-    }
-
-    @Override
     public void update(float deltaTime) {
         time += deltaTime;
         // y = (int) (Math.sin(time * 0.01) * 200) + yPos;
         // x = (int) (Math.cos(time * 0.01) * 200) + xPos;
         // setRotation((float) time);
 
-        if (Input.keyPressed(KeyEvent.VK_W)) {
+        if (Input.isKeyPressed(KeyEvent.VK_W)) {
             y -= deltaTime * speed;
         }
-        if (Input.keyPressed(KeyEvent.VK_S)) {
+        if (Input.isKeyPressed(KeyEvent.VK_S)) {
             y += deltaTime * speed;
         }
-        if (Input.keyPressed(KeyEvent.VK_A)) {
+        if (Input.isKeyPressed(KeyEvent.VK_A)) {
             x -= deltaTime * speed;
         }
-        if (Input.keyPressed(KeyEvent.VK_D)) {
+        if (Input.isKeyPressed(KeyEvent.VK_D)) {
             x += deltaTime * speed;
         }
         // x = (float) MouseInfo.getPointerInfo().getLocation().getX();

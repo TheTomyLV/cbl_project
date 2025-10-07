@@ -4,6 +4,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+/**
+ * A client class to join a server.
+ */
 public class Client {
     private DatagramSocket socket;
     private InetAddress address;
