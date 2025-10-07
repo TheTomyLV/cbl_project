@@ -15,6 +15,8 @@ public class CreateLobbyScene extends Scene {
 
 
         add(createLobbyText);
+        
+
         addObject(new Player(230, 230));
         addObject(new Player(230, 330));
     }

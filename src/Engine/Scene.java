@@ -11,6 +11,9 @@ import javax.swing.*;
 public abstract class Scene extends JPanel {
     ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
 
+    /**
+     * Set scene layout and call setupScene.
+     */
     public Scene() {
         this.setLayout(null);
         setupScene();
@@ -25,6 +28,9 @@ public abstract class Scene extends JPanel {
         }
     }
 
+    /**
+     * Internal method to call update function for all scene gameObjects.
+     */
     void update() {
         for (GameObject gameObject : gameObjects) {
             gameObject.update(Engine.getDeltaTIme());
@@ -36,6 +42,17 @@ public abstract class Scene extends JPanel {
 
     public void addObject(GameObject gameObject) {
         gameObjects.add(gameObject);
+    }
+
+    /**
+     * Internal method for destroying scene gameObjects.
+     * @param gameObject gameObject that is scene
+     */
+    void destroyObject(GameObject gameObject) {
+        if (gameObjects.contains(gameObject)) {
+            gameObject.onDestroy();
+            gameObjects.remove(gameObject);
+        }
     }
 
 }

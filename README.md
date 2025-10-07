@@ -13,18 +13,26 @@ Explore how enemy agents work
 ### Enemy pathfinding
 Explore how enemy pathfinding works
 
-## Todo
+## Todo - in priority
 - [ ] Setup
     - [ ] Setup window
     - [ ] Add join/create lobby button
-    - [ ] Add lobby screen and display all players
+    - [ ] Add lobby screen
     - [ ] Make create lobby work
     - [ ] Make join lobby work
+    - [ ] Display players on lobby screen
     - [ ] Make the start game work
 
-- [ ] Game basic
-    - [ ] Basic object rendering
+- [ ] Game engine basics
+    - [ ] Object rendering
+    - [ ] Object translation
+    - [ ] Object rotation
     - [ ] Camera
+    - [ ] Collisions
+    - [ ] Input
+    - [ ] Sounds
+
+- [ ] Networking
     - [ ] Both players are rendered on screen
     - [ ] Both players input work and they can see each other move around
     - [ ] Players can shoot bullets and both players see the bullets

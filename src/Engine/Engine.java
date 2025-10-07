@@ -53,6 +53,10 @@ public class Engine {
         beginTime = Instant.now();
     }
 
+    /**
+     * Replace the current scene.
+     * @param scene scene
+     */
     public static void changeScene(Scene scene) {
         if (Engine.getCurrentScene() != null) {
             Engine.getEngine().jFrame.remove(Engine.getCurrentScene());
@@ -99,10 +103,10 @@ public class Engine {
     }
 
     /**
-     * Destroy given GameObject.
+     * Destroy given GameObject in currently opened scene.
      */
-    public void destroy(GameObject gameObjecet) {
-
+    public static void destroy(GameObject gameObjecet) {
+        Engine.getEngine().currentScene.destroyObject(gameObjecet);
     }
 
 

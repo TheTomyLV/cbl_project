@@ -1,5 +1,5 @@
 package Engine;
 
-public class Camera {
-    
+public class Camera extends GameObject {
+    static Camera currentCamera;
 }
