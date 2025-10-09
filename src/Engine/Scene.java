@@ -3,6 +3,9 @@ package Engine;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.swing.*;
 
 /**
@@ -41,6 +44,9 @@ public abstract class Scene extends JPanel {
     public abstract void setupScene();
 
     public void addObject(GameObject gameObject) {
+        if (gameObjects.contains(gameObject)) {
+            return;
+        }
         gameObjects.add(gameObject);
     }
 
@@ -53,6 +59,10 @@ public abstract class Scene extends JPanel {
             gameObject.onDestroy();
             gameObjects.remove(gameObject);
         }
+    }
+
+    public ArrayList<GameObject> getGameObjects() {
+        return gameObjects;
     }
 
 }

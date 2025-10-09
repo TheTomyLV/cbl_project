@@ -4,6 +4,10 @@ import Engine.Networking.Client;
 import Engine.Networking.Server;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+
 import javax.swing.JFrame;
 
 public class Engine {
@@ -47,6 +51,29 @@ public class Engine {
     }
 
     public void update() {
+        if (getEngine().server == null && getEngine().client != null) {
+            getEngine().client.sendGameObjects(getCurrentScene().getGameObjects());
+        }
+        if (getEngine().server != null) {
+            ArrayList<GameObject> clientGameObjects = getEngine().server.gameObjects;
+            ArrayList<GameObject> sceneObjects = getCurrentScene().getGameObjects();
+            for (GameObject gameObject : clientGameObjects) {
+                boolean found = false;
+                for (GameObject sceneObject : sceneObjects) {
+                    if (gameObject.equals(sceneObject)) {
+                        sceneObject.x = gameObject.x;
+                        sceneObject.y = gameObject.y;
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
+                    continue;
+                }
+                getEngine().addObject(gameObject);
+            }
+        }
+        
         currentScene.update();
 
         deltaTime = Duration.between(beginTime, Instant.now());
@@ -58,14 +85,15 @@ public class Engine {
      * @param scene scene
      */
     public static void changeScene(Scene scene) {
-        if (Engine.getCurrentScene() != null) {
-            Engine.getEngine().jFrame.remove(Engine.getCurrentScene());
+        if (getCurrentScene() != null) {
+            getEngine().jFrame.remove(Engine.getCurrentScene());
         }
         
-        Engine.getEngine().currentScene = scene;
+        getEngine().currentScene = scene;
         
-        Engine.getEngine().jFrame.add(scene);
-        Engine.getEngine().jFrame.validate();
+        getEngine().jFrame.add(scene);
+        getEngine().jFrame.validate();
+        getEngine().jFrame.requestFocus();
     }
 
     /**
@@ -73,12 +101,12 @@ public class Engine {
      * @param port port
      * @return true if successful server is made
      */
-    public boolean runServer(int port) {
-        server = new Server();
+    public static boolean runServer(int port) {
+        getEngine().server = new Server();
         try {
-            server.startServer(port);
+            getEngine().server.startServer(port);
         } catch (Exception e) {
-            server = null;
+            getEngine().server = null;
             return false;
         }
 
@@ -91,12 +119,12 @@ public class Engine {
      * @param port port
      * @return true if joined the host
      */
-    public boolean runClient(String host, int port) {
-        client = new Client();
+    public static boolean runClient(String host, int port) {
+        getEngine().client = new Client();
         try {
-            client.connect(host, port);
+            getEngine().client.connect(host, port);
         } catch (Exception e) {
-            client = null;
+            getEngine().client = null;
             return false;
         }
         return true;
@@ -106,7 +134,11 @@ public class Engine {
      * Destroy given GameObject in currently opened scene.
      */
     public static void destroy(GameObject gameObjecet) {
-        Engine.getEngine().currentScene.destroyObject(gameObjecet);
+        getCurrentScene().destroyObject(gameObjecet);
+    }
+
+    public static void addObject(GameObject gameObject) {
+        getCurrentScene().addObject(gameObject);
     }
 
 

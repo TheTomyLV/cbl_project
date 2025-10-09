@@ -2,10 +2,13 @@ package Scenes;
 
 import Engine.Scene;
 import GameObjects.Player;
+
+import java.util.Random;
+
 import javax.swing.*;
 
 public class CreateLobbyScene extends Scene {
-    
+
     @Override
     public void setupScene() {
 
@@ -18,7 +21,6 @@ public class CreateLobbyScene extends Scene {
         
 
         addObject(new Player(230, 230));
-        addObject(new Player(230, 330));
     }
     
 }

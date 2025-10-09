@@ -6,12 +6,12 @@ A multiplayer game where players cooperate to kill enemies that come towards the
 Create 2 players that can join the same grid world and can see each other
 ### Build tools (current choice)
 Learn more about build tools, different types, how they work and other things.
-### Git managment
-How git works, explain most important things to make it work
 ### Enemy agents
 Explore how enemy agents work
 ### Enemy pathfinding
 Explore how enemy pathfinding works
+### Game engine
+Learn how a game engine functions
 
 ## Todo - in priority
 - [ ] Setup
@@ -47,7 +47,6 @@ Explore how enemy pathfinding works
 - [ ] Game loop
     - [ ] Score
     - [ ] End screen
-    - [ ] "pause" menu
 
 - [ ] Enviorment
     - [ ] Grid based enviorment
