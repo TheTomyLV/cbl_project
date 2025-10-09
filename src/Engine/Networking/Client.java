@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.UUID;
 
 import Engine.GameObject;
 import Engine.Engine;
@@ -18,9 +19,20 @@ public class Client extends Thread {
     private InetAddress address;
     private int port;
     private boolean running;
+    private final UUID clientId;
+
+    public ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
 
     private byte[] sendingBuf = new byte[8192];
     private byte[] receivingBuf = new byte[8192];
+
+    public Client() {
+        clientId = UUID.randomUUID();
+    }
+
+    public UUID getClientId() {
+        return clientId;
+    }
 
     /**
      * Connect to a server.
@@ -37,14 +49,14 @@ public class Client extends Thread {
     }
 
     /**
-     * Testing message to send to server.
-     * @param msg message to send
+     * Send all local gameObject data to the server.
+     * @param gameObjects Array of local game objects
      */
     public void sendGameObjects(ArrayList<GameObject> gameObjects) {
         if (!running) {
             return;
         }
-        Packet dataPacket = new Packet(Packet.PacketType.Data, gameObjects);
+        Packet dataPacket = new Packet(clientId, gameObjects);
         sendingBuf = dataPacket.getBytes();
         DatagramPacket packet = new DatagramPacket(sendingBuf, sendingBuf.length, address, port);
         
@@ -54,21 +66,24 @@ public class Client extends Thread {
             System.out.println("Failed to send package");
             return;
         }
-        
-        
     }
 
     @Override
     public void run() {
         while (running) {
-            
+            DatagramPacket packet = new DatagramPacket(receivingBuf, receivingBuf.length);
             try {
-                sleep(100);
+                socket.receive(packet);
             } catch (Exception e) {
+                System.out.println("Failed to receive packet");
                 continue;
             }
+            Packet dataPacket = new Packet(packet.getData());
+
+            gameObjects = dataPacket.getGameObjects();
             
         }
+        socket.close();
 
     }
 

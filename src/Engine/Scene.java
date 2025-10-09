@@ -13,6 +13,7 @@ import javax.swing.*;
  */
 public abstract class Scene extends JPanel {
     ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
+    ArrayList<GameObject> serverObjects = new ArrayList<GameObject>();
 
     /**
      * Set scene layout and call setupScene.
@@ -29,6 +30,10 @@ public abstract class Scene extends JPanel {
         for (GameObject gameObject : gameObjects) {
             gameObject.draw((Graphics2D) g);
         }
+
+        for (GameObject gameObject : serverObjects) {
+            gameObject.draw((Graphics2D) g);
+        }
     }
 
     /**
@@ -38,6 +43,13 @@ public abstract class Scene extends JPanel {
         for (GameObject gameObject : gameObjects) {
             gameObject.update(Engine.getDeltaTIme());
         }
+
+        if (Engine.getEngine().server == null) {
+            for (GameObject gameObject : serverObjects) {
+                gameObject.update(Engine.getDeltaTIme());
+            }
+        }
+
         repaint();
     }
 
@@ -48,6 +60,13 @@ public abstract class Scene extends JPanel {
             return;
         }
         gameObjects.add(gameObject);
+    }
+
+    protected void addServerObject(GameObject gameObject) {
+        if (serverObjects.contains(gameObject)) {
+            return;
+        }
+        serverObjects.add(gameObject);
     }
 
     /**
@@ -61,8 +80,19 @@ public abstract class Scene extends JPanel {
         }
     }
 
+    protected void destroyServerObject(GameObject gameObject) {
+        if (serverObjects.contains(gameObject)) {
+            gameObject.onDestroy();
+            serverObjects.remove(gameObject);
+        }
+    }
+
     public ArrayList<GameObject> getGameObjects() {
         return gameObjects;
+    }
+
+    protected ArrayList<GameObject> getServerObject() {
+        return serverObjects;
     }
 
 }

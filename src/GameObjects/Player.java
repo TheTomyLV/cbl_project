@@ -7,7 +7,9 @@ import java.awt.event.KeyEvent;
 public class Player extends GameObject {
 
     double time = 0;
-    float speed = 1.2f;
+    float speed = 5.0f;
+    float xVel = 0;
+    float yVel = 0;
     int xPos;
     int yPos;
 
@@ -35,17 +37,22 @@ public class Player extends GameObject {
         // setRotation((float) time);
 
         if (Input.isKeyPressed(KeyEvent.VK_W)) {
-            y -= deltaTime * speed;
+            yVel -= deltaTime * speed;
         }
         if (Input.isKeyPressed(KeyEvent.VK_S)) {
-            y += deltaTime * speed;
+            yVel += deltaTime * speed;
         }
         if (Input.isKeyPressed(KeyEvent.VK_A)) {
-            x -= deltaTime * speed;
+            xVel -= deltaTime * speed;
         }
         if (Input.isKeyPressed(KeyEvent.VK_D)) {
-            x += deltaTime * speed;
+            xVel += deltaTime * speed;
         }
+
+        x += xVel;
+        y += yVel;
+        yVel *= 0.99f; // Hacky for now
+        xVel *= 0.99f;
         // x = (float) MouseInfo.getPointerInfo().getLocation().getX();
         // y = (float) MouseInfo.getPointerInfo().getLocation().getY();
     }

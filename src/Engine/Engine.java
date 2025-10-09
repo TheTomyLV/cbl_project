@@ -18,6 +18,7 @@ public class Engine {
     boolean running;
     Duration deltaTime = Duration.ZERO;
     Instant beginTime = Instant.now();
+    Duration tick = Duration.ZERO;
     static Engine engine;
 
     public Engine() {
@@ -47,19 +48,47 @@ public class Engine {
     }
 
     public static float getDeltaTIme() {
-        return engine.deltaTime.toMillis();
+        return engine.deltaTime.toNanos() / 1_000_000_000f;
     }
 
-    public void update() {
-        if (getEngine().server == null && getEngine().client != null) {
+    private void networkUpdate() {
+        if (getEngine().client != null) {
             getEngine().client.sendGameObjects(getCurrentScene().getGameObjects());
+
+            if (getEngine().server == null) {
+                // receiving server objects
+                ArrayList<GameObject> serverObjects = getEngine().client.gameObjects;
+                ArrayList<GameObject> localObjects = getCurrentScene().getServerObject();
+                for (GameObject gameObject : serverObjects) {
+                    boolean found = false;
+                    for (GameObject clientObject : localObjects) {
+                        if (gameObject.equals(clientObject)) {
+                            clientObject.updateValues(gameObject.x, gameObject.y, gameObject.scale, gameObject.rotation);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        continue;
+                    }
+
+                    if (!getCurrentScene().getGameObjects().contains(gameObject)) {
+                        Engine.getCurrentScene().addServerObject(gameObject);
+                    }
+                    
+                }
+            }
+
         }
         if (getEngine().server != null) {
+            getEngine().server.sendServerObjects(getCurrentScene().getServerObject());
+
+            // Receiving client objects
             ArrayList<GameObject> clientGameObjects = getEngine().server.gameObjects;
-            ArrayList<GameObject> sceneObjects = getCurrentScene().getGameObjects();
+            ArrayList<GameObject> serverObjects = getCurrentScene().getServerObject();
             for (GameObject gameObject : clientGameObjects) {
                 boolean found = false;
-                for (GameObject sceneObject : sceneObjects) {
+                for (GameObject sceneObject : serverObjects) {
                     if (gameObject.equals(sceneObject)) {
                         sceneObject.x = gameObject.x;
                         sceneObject.y = gameObject.y;
@@ -70,13 +99,21 @@ public class Engine {
                 if (found) {
                     continue;
                 }
-                getEngine().addObject(gameObject);
+                Engine.getCurrentScene().addServerObject(gameObject);
             }
+        }
+    }
+
+    public void update() {
+        if (true) {
+            networkUpdate();
+            tick = Duration.ZERO;
         }
         
         currentScene.update();
 
         deltaTime = Duration.between(beginTime, Instant.now());
+        tick = tick.plus(deltaTime);
         beginTime = Instant.now();
     }
 

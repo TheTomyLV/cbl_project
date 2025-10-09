@@ -12,35 +12,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import Engine.GameObject;
 
 public class Packet {
 
-    public enum PacketType {
-        Connected,
-        Disconnected,
-        Data
-    }
-
-    PacketType packetType;
     byte[] data;
     ArrayList<GameObject> gameOjbects = new ArrayList<GameObject>();
+    UUID id;
 
     public Packet(byte[] bytes) {
         data = bytes;
         try {
             deserializeData(bytes);
         } catch (Exception e) {
-            System.out.println("Couldn't deserialize data");;
+            System.out.println("Couldn't deserialize data");
         }
-        
     }
 
-    public Packet(PacketType packetType, ArrayList<GameObject> gameObjects) {
-        this.packetType = packetType;
+    public Packet(UUID senderId, ArrayList<GameObject> gameObjects) {
         try {
-            serializeData(gameObjects);
+            serializeData(senderId, gameObjects);
         } catch (Exception e) {
             data = new byte[0];
             System.out.println("Couldn't serialize gameObjects");;
@@ -55,12 +48,16 @@ public class Packet {
         return data;
     }
 
-    private void serializeData(ArrayList<GameObject> gameObjects) throws IOException {
+    private void serializeData(UUID id, ArrayList<GameObject> gameObjects) throws IOException {
+        if (gameObjects == null) {
+            return;
+        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 
-        // Write packet to array
-        dos.writeInt(packetType.ordinal());
+        // Write id
+        dos.writeLong(id.getMostSignificantBits());
+        dos.writeLong(id.getLeastSignificantBits());
 
         // Write object count
         dos.writeInt(gameObjects.size());
@@ -90,9 +87,10 @@ public class Packet {
     private void deserializeData(byte[] data) throws IOException {
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
 
-        // Read packet type
-        int packetOrdinal = dis.readInt();
-        packetType = PacketType.values()[packetOrdinal];
+        // Read senderId
+        long most = dis.readLong();
+        long least = dis.readLong();
+        id  = new UUID(most, least);
 
         // Read object count
         int objectCount = dis.readInt();
@@ -104,7 +102,7 @@ public class Packet {
         }
 
         // Calculate where object bytes start
-        int headerSize = 4 + 4 + 4 * objectCount; // packetType + objectCount + offsets
+        int headerSize = 16 + 4 + 4 * objectCount; // packetType + objectCount + offsets
         byte[] objectData = Arrays.copyOfRange(data, headerSize, data.length);
 
         ArrayList<GameObject> objects = new ArrayList<GameObject>();

@@ -16,6 +16,8 @@ import java.util.UUID;
  * Abstract GameObject that exsists in scenes.
  */
 public class GameObject implements Serializable {
+    private static final float LERP_SPEED = 10.0f;
+
     private final UUID id;
     public float x = 0;
     public float y = 0;
@@ -23,6 +25,9 @@ public class GameObject implements Serializable {
     float rotation = 0.0f;
     Scene scene;
     BufferedImage currentImage;
+
+    private float targetX;
+    private float targetY;
 
     public GameObject() {
         this.id = UUID.randomUUID();
@@ -33,7 +38,9 @@ public class GameObject implements Serializable {
         loadImage("", "src\\Assets\\Player.png");
         this.id = id;
         this.x = x;
+        targetX = x;
         this.y = y;
+        targetY = y;
         this.scale = scale;
         this.rotation = rotation;
     }
@@ -48,7 +55,7 @@ public class GameObject implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (obj == null || !(obj instanceof GameObject)) {
             return false;
         }
         GameObject that = (GameObject) obj;
@@ -97,7 +104,24 @@ public class GameObject implements Serializable {
     }
 
     protected void update(float deltaTime) {
-        return;
+        if (getClass() != GameObject.class) {
+            return;
+        }
+        float t = (LERP_SPEED * deltaTime);
+
+        if (t > 1.0f) {
+            t = 1.0f;
+        }
+
+        x += (targetX - x) * t;
+        y += (targetY - y) * t;
+    }
+
+    protected void updateValues(float x, float y, float scale, float rotation) {
+        targetX = x;
+        targetY = y;
+        this.scale = scale;
+        this.rotation = rotation;
     }
 
     /**
