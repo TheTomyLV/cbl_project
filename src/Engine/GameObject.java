@@ -83,7 +83,7 @@ public class GameObject implements Serializable {
     protected void draw(Graphics2D g2d) {
         AffineTransform at = new AffineTransform();
 
-        at.translate(x, y);
+        at.translate(x - Camera.currentCamera.x + Engine.getCurrentScene().getWidth() / 2, y - Camera.currentCamera.y + Engine.getCurrentScene().getHeight() / 2);
         at.rotate(Math.toRadians(rotation));
         at.scale(scale, scale);
         at.translate(-currentImage.getWidth() / 2, -currentImage.getHeight() / 2);

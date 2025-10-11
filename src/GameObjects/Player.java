@@ -1,5 +1,6 @@
 package GameObjects;
 
+import Engine.Camera;
 import Engine.GameObject;
 import Engine.Input;
 import java.awt.event.KeyEvent;
@@ -53,6 +54,9 @@ public class Player extends GameObject {
         y += yVel;
         yVel *= 0.99f; // Hacky for now
         xVel *= 0.99f;
+
+        Camera.currentCamera.x = x;
+        Camera.currentCamera.y = y;
         // x = (float) MouseInfo.getPointerInfo().getLocation().getX();
         // y = (float) MouseInfo.getPointerInfo().getLocation().getY();
     }

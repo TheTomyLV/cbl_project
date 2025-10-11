@@ -32,6 +32,7 @@ public class Engine {
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setTitle("Game");
         jFrame.addKeyListener(new Input());
+        new Camera();
         running = true;
     }
 
@@ -55,43 +56,14 @@ public class Engine {
         if (getEngine().client != null) {
             getEngine().client.sendGameObjects(getCurrentScene().getGameObjects());
 
-            if (getEngine().server == null) {
-                // receiving server objects
-                ArrayList<GameObject> serverObjects = getEngine().client.gameObjects;
-                ArrayList<GameObject> localObjects = getCurrentScene().getServerObject();
-                for (GameObject gameObject : serverObjects) {
-                    boolean found = false;
-                    for (GameObject clientObject : localObjects) {
-                        if (gameObject.equals(clientObject)) {
-                            clientObject.updateValues(gameObject.x, gameObject.y, gameObject.scale, gameObject.rotation);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
-                        continue;
-                    }
-
-                    if (!getCurrentScene().getGameObjects().contains(gameObject)) {
-                        Engine.getCurrentScene().addServerObject(gameObject);
-                    }
-                    
-                }
-            }
-
-        }
-        if (getEngine().server != null) {
-            getEngine().server.sendServerObjects(getCurrentScene().getServerObject());
-
-            // Receiving client objects
-            ArrayList<GameObject> clientGameObjects = getEngine().server.gameObjects;
-            ArrayList<GameObject> serverObjects = getCurrentScene().getServerObject();
-            for (GameObject gameObject : clientGameObjects) {
+            // receiving server objects
+            ArrayList<GameObject> serverObjects = getEngine().client.gameObjects;
+            ArrayList<GameObject> localObjects = getCurrentScene().getServerObject();
+            for (GameObject gameObject : serverObjects) {
                 boolean found = false;
-                for (GameObject sceneObject : serverObjects) {
-                    if (gameObject.equals(sceneObject)) {
-                        sceneObject.x = gameObject.x;
-                        sceneObject.y = gameObject.y;
+                for (GameObject clientObject : localObjects) {
+                    if (gameObject.equals(clientObject)) {
+                        clientObject.updateValues(gameObject.x, gameObject.y, gameObject.scale, gameObject.rotation);
                         found = true;
                         break;
                     }
@@ -99,13 +71,21 @@ public class Engine {
                 if (found) {
                     continue;
                 }
-                Engine.getCurrentScene().addServerObject(gameObject);
+
+                if (!getCurrentScene().getGameObjects().contains(gameObject)) {
+                    Engine.getCurrentScene().addServerObject(gameObject);
+                }
+                    
             }
+
+        }
+        if (getEngine().server != null) {
+            getEngine().server.sendServerObjects(getEngine().server.gameObjects);
         }
     }
 
     public void update() {
-        if (true) {
+        if (tick.toMillis() >= 16) {
             networkUpdate();
             tick = Duration.ZERO;
         }

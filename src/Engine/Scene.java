@@ -3,9 +3,6 @@ package Engine;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.swing.*;
 
 /**
@@ -44,10 +41,8 @@ public abstract class Scene extends JPanel {
             gameObject.update(Engine.getDeltaTIme());
         }
 
-        if (Engine.getEngine().server == null) {
-            for (GameObject gameObject : serverObjects) {
-                gameObject.update(Engine.getDeltaTIme());
-            }
+        for (GameObject gameObject : serverObjects) {
+            gameObject.update(Engine.getDeltaTIme());
         }
 
         repaint();
@@ -94,5 +89,6 @@ public abstract class Scene extends JPanel {
     protected ArrayList<GameObject> getServerObject() {
         return serverObjects;
     }
+
 
 }

@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import Engine.Engine;
 import Engine.GameObject;
 
 /**
@@ -58,6 +59,24 @@ public class Server extends Thread {
         }
     }
 
+    private void updateGameObjects(ArrayList<GameObject> newGameObjects) {
+        for (GameObject clientObject : newGameObjects) {
+            boolean found = false;
+            for (GameObject serverObject : gameObjects) {
+                if (clientObject.equals(serverObject)) {
+                    serverObject.x = clientObject.x;
+                    serverObject.y = clientObject.y;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            gameObjects.add(clientObject);
+        }
+    }
+
     @Override
     public void run() {
         while (running) {
@@ -83,8 +102,8 @@ public class Server extends Thread {
             if (newClient) {
                 clients.add(currentClient);
             }
-
-            gameObjects = dataPacket.getGameObjects();
+            
+            updateGameObjects(dataPacket.getGameObjects());
             
         }
         socket.close();

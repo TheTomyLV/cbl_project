@@ -15,27 +15,33 @@ Learn how a game engine functions
 
 ## Todo - in priority
 - [ ] Setup
-    - [ ] Setup window
-    - [ ] Add join/create lobby button
+    - [x] Setup window
+    - [x] Add join/create lobby button
     - [ ] Add lobby screen
-    - [ ] Make create lobby work
-    - [ ] Make join lobby work
+    - [x] Make create lobby work
+    - [x] Make join lobby work
     - [ ] Display players on lobby screen
-    - [ ] Make the start game work
+    - [x] Make the start game work
+
+- [ ] UI
+    - [ ] UI is scaled properly
 
 - [ ] Game engine basics
-    - [ ] Object rendering
-    - [ ] Object translation
-    - [ ] Object rotation
-    - [ ] Camera
+    - [X] Object rendering
+    - [X] Object translation
+    - [X] Object rotation
+    - [X] Camera
     - [ ] Collisions
-    - [ ] Input
+    - [X] Input
     - [ ] Sounds
+    - [ ] Better camera
 
 - [ ] Networking
-    - [ ] Both players are rendered on screen
-    - [ ] Both players input work and they can see each other move around
+    - [X] Both players are rendered on screen
+    - [X] Both players input work and they can see each other move around
     - [ ] Players can shoot bullets and both players see the bullets
+    - [ ] Handle player disconnects
+    - [ ] Server owned entities
 
 - [ ] Enemies(Enemies is an abstract class that can be extended, for example add stronger units, ranged units etc.)
     - [ ] Enemies randomly spawn around for all clients
