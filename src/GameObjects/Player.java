@@ -3,6 +3,9 @@ package GameObjects;
 import Engine.Camera;
 import Engine.GameObject;
 import Engine.Input;
+import Engine.Sound.AudioClip;
+import Engine.Sound.AudioPlayer;
+
 import java.awt.event.KeyEvent;
 
 public class Player extends GameObject {
@@ -13,6 +16,7 @@ public class Player extends GameObject {
     float yVel = 0;
     int xPos;
     int yPos;
+    AudioClip shooting = new AudioClip("src\\Assets\\audio\\shoot.wav");
 
     public Player(int x, int y) {
         xPos = x;
@@ -23,7 +27,7 @@ public class Player extends GameObject {
 
     @Override
     protected void setup() {
-        loadImage("player", "src\\Assets\\Player.png");
+        loadImage("src\\Assets\\art\\Player.png");
         //setRotation(45);
         scale = 0.1f;
         y = 100;
@@ -48,6 +52,10 @@ public class Player extends GameObject {
         }
         if (Input.isKeyPressed(KeyEvent.VK_D)) {
             xVel += deltaTime * speed;
+        }
+        if (Input.isKeyPressed(KeyEvent.VK_SPACE) && time >= 0.1) {
+            AudioPlayer.playAudio(shooting, false);
+            time = 0;
         }
 
         x += xVel;

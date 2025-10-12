@@ -2,6 +2,8 @@ package Engine;
 
 import Engine.Networking.Client;
 import Engine.Networking.Server;
+import Engine.Sound.AudioPlayer;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -89,8 +91,9 @@ public class Engine {
             networkUpdate();
             tick = Duration.ZERO;
         }
-        
+
         currentScene.update();
+        
 
         deltaTime = Duration.between(beginTime, Instant.now());
         tick = tick.plus(deltaTime);

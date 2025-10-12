@@ -35,6 +35,7 @@ Learn how a game engine functions
     - [X] Input
     - [ ] Sounds
     - [ ] Better camera
+    - [ ] Sprite assets are loaded in at start
 
 - [ ] Networking
     - [X] Both players are rendered on screen

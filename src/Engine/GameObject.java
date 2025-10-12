@@ -9,7 +9,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -35,7 +34,7 @@ public class GameObject implements Serializable {
     }
 
     GameObject(UUID id, float x, float y, float scale, float rotation) {
-        loadImage("", "src\\Assets\\Player.png");
+        loadImage("src\\Assets\\art\\Player.png");
         this.id = id;
         this.x = x;
         targetX = x;
@@ -64,10 +63,9 @@ public class GameObject implements Serializable {
 
     /**
      * Load all the required images for this component.
-     * @param name Name of the image
      * @param path path to the image
      */
-    public void loadImage(String name, String path) {
+    public void loadImage(String path) {
         BufferedImage image = Sprite.getImage(path);
         currentImage = image;
     }
@@ -81,6 +79,9 @@ public class GameObject implements Serializable {
      * @param g2d the Graphics2D component of the game panel
      */
     protected void draw(Graphics2D g2d) {
+        if (currentImage == null) {
+            return;
+        }
         AffineTransform at = new AffineTransform();
 
         at.translate(x - Camera.currentCamera.x + Engine.getCurrentScene().getWidth() / 2, y - Camera.currentCamera.y + Engine.getCurrentScene().getHeight() / 2);

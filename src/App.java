@@ -1,4 +1,5 @@
 import Engine.Engine;
+import Engine.Sprite;
 import Scenes.LobbyScene;
 
 /**
@@ -9,9 +10,10 @@ public class App {
     public void run() {
         Engine engine = new Engine();
         engine.setup();
+        Sprite.loadAssets("src\\Assets\\art");
         
         LobbyScene lobbyScene = new LobbyScene();
-        engine.changeScene(lobbyScene);
+        Engine.changeScene(lobbyScene);
 
         while (engine.isRunning()) {
             engine.update();

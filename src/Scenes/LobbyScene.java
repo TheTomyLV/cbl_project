@@ -2,7 +2,6 @@ package Scenes;
 
 import Engine.Engine;
 import Engine.Scene;
-import GameObjects.Player;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -26,9 +25,8 @@ public class LobbyScene extends Scene {
             public void actionPerformed(ActionEvent e) {
                 boolean output = Engine.runServer(Integer.parseInt(portTextField.getText()));
                 if (output) {
-                    Engine.changeScene(new CreateLobbyScene());
+                    Engine.changeScene(new GameScene());
                 }
-                
             }
         });
 
@@ -39,7 +37,7 @@ public class LobbyScene extends Scene {
                 int port = Integer.parseInt(portTextField.getText());
                 boolean output = Engine.runClient(ip, port);
                 if (output) {
-                    Engine.changeScene(new CreateLobbyScene());
+                    Engine.changeScene(new GameScene());
                 }
             }
         });
