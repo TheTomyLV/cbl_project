@@ -1,121 +1,104 @@
 package Engine.Networking;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.math.BigInteger;
+import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.nio.ByteOrder;
 import java.util.UUID;
 
-import Engine.GameObject;
-
+/**
+ * Compact UDP packet with a small header (seq/ack/timestamp/flags) and raw payload.
+ * Keep this class simple and allocation-light; it's on the hot path.
+ */
 public class Packet {
+    // --- header constants ---
+    private static final int MAGIC = 0xCB1CB1;     // identifies our protocol
+    private static final short VERSION = 1;        // bump if header format changes
 
-    byte[] data;
-    ArrayList<GameObject> gameOjbects = new ArrayList<GameObject>();
-    UUID id;
+    // --- header fields ---
+    private int sequence;          // local sequence number (sender increments)
+    private int ack;               // last sequence seen from peer
+    private int timestampMs;       // sender clock when sending (ms)
+    private short flags;           // bitfield: 1 = snapshot, 2 = ping, 4 = reliable
+    private short payloadType;     // app-level discriminator if you need multiple message kinds
+    private UUID senderId;         // who sent this (optional but useful on server)
 
-    public Packet(byte[] bytes) {
-        data = bytes;
-        try {
-            deserializeData(bytes);
-        } catch (Exception e) {
-            System.out.println("Couldn't deserialize data");
-        }
+    // --- body ---
+    private byte[] payload;        // application data (already serialized elsewhere)
+
+    public Packet() {
+        this.senderId = new UUID(0L, 0L);
+        this.payload = new byte[0];
     }
 
-    public Packet(UUID senderId, ArrayList<GameObject> gameObjects) {
-        try {
-            serializeData(senderId, gameObjects);
-        } catch (Exception e) {
-            data = new byte[0];
-            System.out.println("Couldn't serialize gameObjects");;
-        }
+    public Packet(UUID senderId, byte[] payload) {
+        this.senderId = senderId == null ? new UUID(0L, 0L) : senderId;
+        this.payload = payload == null ? new byte[0] : payload;
     }
 
-    public ArrayList<GameObject> getGameObjects() {
-        return gameOjbects;
+    // --- header accessors ---
+    public void setHeader(int sequence, int ack, int timestampMs, short flags, short payloadType) {
+        this.sequence = sequence;
+        this.ack = ack;
+        this.timestampMs = timestampMs;
+        this.flags = flags;
+        this.payloadType = payloadType;
     }
 
-    public byte[] getBytes() {
-        return data;
+    public int getSequence() { return sequence; }
+    public int getAck() { return ack; }
+    public int getTimestampMs() { return timestampMs; }
+    public short getFlags() { return flags; }
+    public short getPayloadType() { return payloadType; }
+    public UUID getSenderId() { return senderId; }
+    public byte[] getPayload() { return payload; }
+
+    // --- helpers ---
+    public boolean isReliable() { return (flags & 4) != 0; }
+    public boolean isPing() { return (flags & 2) != 0; }
+
+    /** Serialize header + payload into a single byte array (little-endian for compactness). */
+    public byte[] toBytes() {
+        // header layout (bytes):
+        // magic(4) | version(2) | seq(4) | ack(4) | ts(4) | flags(2) | ptype(2)
+        // | sender MSB(8) | sender LSB(8) | length(4) | payload(len)
+        int headerSize = 4 + 2 + 4 + 4 + 4 + 2 + 2 + 8 + 8 + 4;
+        int len = payload == null ? 0 : payload.length;
+        ByteBuffer bb = ByteBuffer.allocate(headerSize + len).order(ByteOrder.LITTLE_ENDIAN);
+        bb.putInt(MAGIC);
+        bb.putShort(VERSION);
+        bb.putInt(sequence);
+        bb.putInt(ack);
+        bb.putInt(timestampMs);
+        bb.putShort(flags);
+        bb.putShort(payloadType);
+        bb.putLong(senderId.getMostSignificantBits());
+        bb.putLong(senderId.getLeastSignificantBits());
+        bb.putInt(len);
+        if (len > 0) bb.put(payload);
+        return bb.array();
     }
 
-    private void serializeData(UUID id, ArrayList<GameObject> gameObjects) throws IOException {
-        if (gameObjects == null) {
-            return;
-        }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
+    /** Parse bytes into a Packet. Throws if MAGIC/VERSION mismatch or truncated. */
+    public static Packet fromBytes(byte[] bytes, int length) throws IOException {
+        if (bytes == null || length < 4 + 2) throw new EOFException("packet too short");
+        ByteBuffer bb = ByteBuffer.wrap(bytes, 0, length).order(ByteOrder.LITTLE_ENDIAN);
+        int magic = bb.getInt();
+        short version = bb.getShort();
+        if (magic != MAGIC || version != VERSION) throw new StreamCorruptedException("bad packet header");
 
-        // Write id
-        dos.writeLong(id.getMostSignificantBits());
-        dos.writeLong(id.getLeastSignificantBits());
-
-        // Write object count
-        dos.writeInt(gameObjects.size());
-
-        // Serialize all objects
-        List<byte[]> serializedObjects = new ArrayList<>();
-        for (GameObject obj : gameObjects) {
-            serializedObjects.add(obj.toBytes());
-        }
-
-        // Calculate and write start indecies
-        int currentOffset = 0;
-        for (byte[] objBytes : serializedObjects) {
-            dos.writeInt(currentOffset);
-            currentOffset += objBytes.length;
-        }
-
-        // Write all GameObjects
-        for (byte[] objBytes : serializedObjects) {
-            dos.write(objBytes);
-        }
-
-        dos.flush();
-        data = baos.toByteArray();
+        Packet p = new Packet();
+        p.sequence = bb.getInt();
+        p.ack = bb.getInt();
+        p.timestampMs = bb.getInt();
+        p.flags = bb.getShort();
+        p.payloadType = bb.getShort();
+        long msb = bb.getLong();
+        long lsb = bb.getLong();
+        p.senderId = new UUID(msb, lsb);
+        int len = bb.getInt();
+        if (len < 0 || len > (length - bb.position())) throw new EOFException("invalid payload length");
+        p.payload = new byte[len];
+        if (len > 0) bb.get(p.payload);
+        return p;
     }
-
-    private void deserializeData(byte[] data) throws IOException {
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
-
-        // Read senderId
-        long most = dis.readLong();
-        long least = dis.readLong();
-        id  = new UUID(most, least);
-
-        // Read object count
-        int objectCount = dis.readInt();
-
-        // Read offsets
-        int[] offsets = new int[objectCount];
-        for (int i = 0; i < objectCount; i++) {
-            offsets[i] = dis.readInt();
-        }
-
-        // Calculate where object bytes start
-        int headerSize = 16 + 4 + 4 * objectCount; // packetType + objectCount + offsets
-        byte[] objectData = Arrays.copyOfRange(data, headerSize, data.length);
-
-        ArrayList<GameObject> objects = new ArrayList<GameObject>();
-        for (int i = 0; i < objectCount; i++) {
-            int start = offsets[i];
-            int end = (i == objectCount - 1) ? objectData.length : offsets[i + 1];
-
-            byte[] objBytes = Arrays.copyOfRange(objectData, start, end);
-            GameObject obj = GameObject.fromBytes(objBytes);
-            objects.add(obj);
-        }
-
-        gameOjbects = objects;
-    }
-
 }

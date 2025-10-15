@@ -3,42 +3,19 @@ package Engine.Networking;
 import java.net.InetAddress;
 import java.util.UUID;
 
-import Engine.GameObject;
-
+/** Lightweight server-side record for a connected client. */
 public class ClientData {
-    private final InetAddress address;
-    private final int port;
-    private final UUID clientId;
+    public final UUID id;
+    public final InetAddress address;
+    public final int port;
 
-    ClientData(InetAddress address, int port, UUID clientId) {
-        this.clientId = clientId;
+    public volatile int lastSeqFromClient = 0;
+    public volatile int lastAckSent = 0;
+    public volatile long lastHeardAtMs = 0L;
+
+    public ClientData(UUID id, InetAddress address, int port) {
+        this.id = id;
         this.address = address;
         this.port = port;
     }
-
-    public InetAddress getAddress() {
-        return address;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public int hashCode() {
-        return clientId.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        ClientData that = (ClientData) obj;
-        return clientId.equals(that.clientId);
-    }
-
 }
