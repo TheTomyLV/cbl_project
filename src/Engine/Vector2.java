@@ -41,6 +41,10 @@ public class Vector2 {
         return (float) Math.sqrt(x * x + y * y);
     }
 
+    public float getRotation() {
+        return (float) Math.atan2(y, x);
+    }
+
     /**
      * Returns a vector with length 1, if the vector is (0, 0) returns the same vector.
      * @return A vector with length 1

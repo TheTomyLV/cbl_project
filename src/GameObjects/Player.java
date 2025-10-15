@@ -3,10 +3,10 @@ package GameObjects;
 import Engine.Camera;
 import Engine.Engine;
 import Engine.GameObject;
-import Engine.Input;
 import Engine.Sound.AudioClip;
 import Engine.Sound.AudioPlayer;
 import Engine.Vector2;
+import Engine.Inputs.Input;
 
 import java.awt.event.KeyEvent;
 
@@ -44,13 +44,15 @@ public class Player extends GameObject {
         if (Input.isKeyPressed(KeyEvent.VK_D)) {
             velocity.x += deltaTime * speed;
         }
-        if (Input.isKeyPressed(KeyEvent.VK_SPACE) && time >= 0.1) {
+        if (Input.mouse.isClicked(0) && time >= 0.1) {
             AudioPlayer.playAudio(shooting, false);
             time = 0;
         }
 
         position = position.add(velocity);
         velocity = velocity.multiply(0.99f); // Hacky for now
+        rotation = Input.mouse.getWorldPosition().subtract(position).getRotation();
+        rotation = (float) Math.toDegrees(rotation);
 
         Camera.currentCamera.position = position;
     }

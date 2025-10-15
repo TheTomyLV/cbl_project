@@ -1,5 +1,6 @@
 package Engine;
 
+import Engine.Inputs.Input;
 import Engine.Networking.Client;
 import Engine.Networking.Server;
 import Engine.Sound.AudioPlayer;
@@ -34,7 +35,10 @@ public class Engine {
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setTitle("Game");
-        jFrame.addKeyListener(new Input());
+        Input input = new Input();
+        jFrame.addKeyListener(input);
+        jFrame.addMouseListener(input);
+        jFrame.addMouseMotionListener(input);
         new Camera();
         running = true;
     }
