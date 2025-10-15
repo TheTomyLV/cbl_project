@@ -1,13 +1,12 @@
 package GameObjects;
 
+
 import Engine.Camera;
-import Engine.Engine;
 import Engine.GameObject;
+import Engine.Inputs.Input;
 import Engine.Sound.AudioClip;
 import Engine.Sound.AudioPlayer;
 import Engine.Vector2;
-import Engine.Inputs.Input;
-
 import java.awt.event.KeyEvent;
 
 public class Player extends GameObject {

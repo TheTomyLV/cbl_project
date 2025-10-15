@@ -14,6 +14,15 @@ Explore how enemy pathfinding works
 Learn how a game engine functions
 
 ## Todo - in priority
+- [ ] Classed that need to be refactored
+    - [ ] Mouse.java - needs to have the correct position, as right now it's attached to the frame, but needs to be attached to the panel
+    - [ ] Client.java
+    - [ ] Server.java
+    - [ ] Packet.java - needs to send the current scene and also add events
+    - [ ] AudioClip.java and AudioPlayer.java needs to be handled better, as the initial loading of the audio hangs the game
+    - [ ] Engine.java
+    - [ ] Sprite.java - Needs to be able to get the image index for serialization
+
 - [ ] Setup
     - [x] Setup window
     - [x] Add join/create lobby button
@@ -35,7 +44,7 @@ Learn how a game engine functions
     - [X] Input
     - [ ] Sounds
     - [ ] Better camera
-    - [ ] Sprite assets are loaded in at start
+    - [X] Sprite assets are loaded in at start
 
 - [ ] Networking
     - [X] Both players are rendered on screen
