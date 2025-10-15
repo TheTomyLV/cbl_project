@@ -38,7 +38,6 @@ public class Server extends Thread {
         if (!running) {
             return;
         }
-
         Packet dataPacket = new Packet(serverId, serverObjects);
         sendingBuf = dataPacket.getBytes();
 
@@ -64,8 +63,9 @@ public class Server extends Thread {
             boolean found = false;
             for (GameObject serverObject : gameObjects) {
                 if (clientObject.equals(serverObject)) {
-                    serverObject.x = clientObject.x;
-                    serverObject.y = clientObject.y;
+                    serverObject.position = clientObject.position;
+                    serverObject.scale = clientObject.scale;
+                    serverObject.rotation = clientObject.rotation;
                     found = true;
                     break;
                 }

@@ -3,8 +3,7 @@ package Engine;
 public class Camera {
     public static Camera currentCamera;
 
-    public float x = 0f;
-    public float y = 0f;
+    public Vector2 position = new Vector2(0f, 0f);
 
     Camera() {
         currentCamera = this;

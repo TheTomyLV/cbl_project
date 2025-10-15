@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 
@@ -65,7 +66,7 @@ public class Engine {
                 boolean found = false;
                 for (GameObject clientObject : localObjects) {
                     if (gameObject.equals(clientObject)) {
-                        clientObject.updateValues(gameObject.x, gameObject.y, gameObject.scale, gameObject.rotation);
+                        clientObject.updateValues(gameObject.position, gameObject.scale, gameObject.rotation);
                         found = true;
                         break;
                     }

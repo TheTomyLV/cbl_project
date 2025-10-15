@@ -1,6 +1,7 @@
 package Engine;
 
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -18,30 +19,29 @@ public class GameObject implements Serializable {
     private static final float LERP_SPEED = 10.0f;
 
     private final UUID id;
-    public float x = 0;
-    public float y = 0;
-    public float scale = 1.0f;
-    float rotation = 0.0f;
-    Scene scene;
-    BufferedImage currentImage;
+    public Vector2 position = new Vector2(0, 0);
+    public Vector2 scale = new Vector2(1, 1);
+    public float rotation = 0.0f;
+    public Sprite currentSprite;
+    private BufferedImage currentImage;
 
-    private float targetX;
-    private float targetY;
+
+    // For smooth server object movement
+    private Vector2 targetPos;
 
     public GameObject() {
         this.id = UUID.randomUUID();
         setup();
     }
 
-    GameObject(UUID id, float x, float y, float scale, float rotation) {
+    GameObject(UUID id, Vector2 position, Vector2 scale, float rotation) {
         loadImage("src\\Assets\\art\\Player.png");
         this.id = id;
-        this.x = x;
-        targetX = x;
-        this.y = y;
-        targetY = y;
+        this.position = position;
+        this.scale = scale;
         this.scale = scale;
         this.rotation = rotation;
+        targetPos = position;
     }
 
     @Override
@@ -66,8 +66,7 @@ public class GameObject implements Serializable {
      * @param path path to the image
      */
     public void loadImage(String path) {
-        BufferedImage image = Sprite.getImage(path);
-        currentImage = image;
+        currentImage = Sprite.getImage(path);
     }
 
     public void setRotation(float degrees) {
@@ -84,9 +83,12 @@ public class GameObject implements Serializable {
         }
         AffineTransform at = new AffineTransform();
 
-        at.translate(x - Camera.currentCamera.x + Engine.getCurrentScene().getWidth() / 2, y - Camera.currentCamera.y + Engine.getCurrentScene().getHeight() / 2);
+        Vector2 panelDimensions = new Vector2(Engine.getCurrentScene().getWidth() / 2, Engine.getCurrentScene().getHeight() / 2);
+        Vector2 panelPos = position.subtract(Camera.currentCamera.position);
+        panelPos = panelPos.add(panelDimensions);
+        at.translate(panelPos.x, panelPos.y);
         at.rotate(Math.toRadians(rotation));
-        at.scale(scale, scale);
+        at.scale(scale.x, scale.y);
         at.translate(-currentImage.getWidth() / 2, -currentImage.getHeight() / 2);
 
         g2d.drawImage(currentImage, at, null);
@@ -113,14 +115,11 @@ public class GameObject implements Serializable {
         if (t > 1.0f) {
             t = 1.0f;
         }
-
-        x += (targetX - x) * t;
-        y += (targetY - y) * t;
+        position = position.add(targetPos.subtract(position).multiply(t));
     }
 
-    protected void updateValues(float x, float y, float scale, float rotation) {
-        targetX = x;
-        targetY = y;
+    public void updateValues(Vector2 position, Vector2 scale, float rotation) {
+        targetPos = position;
         this.scale = scale;
         this.rotation = rotation;
     }
@@ -135,10 +134,12 @@ public class GameObject implements Serializable {
 
         dos.writeLong(id.getMostSignificantBits());
         dos.writeLong(id.getLeastSignificantBits());
-        dos.writeFloat(x);
-        dos.writeFloat(y);
-        dos.writeFloat(scale);
+        dos.writeFloat(position.x);
+        dos.writeFloat(position.y);
+        dos.writeFloat(scale.x);
+        dos.writeFloat(scale.y);
         dos.writeFloat(rotation);
+        dos.writeInt(0);
 
         dos.flush();
         return baos.toByteArray();
@@ -148,12 +149,16 @@ public class GameObject implements Serializable {
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
         long most = dis.readLong();
         long least = dis.readLong();
-        UUID id = new UUID(most, least);
         float x = dis.readFloat();
         float y = dis.readFloat();
-        float scale = dis.readFloat();
+        float scaleX = dis.readFloat();
+        float scaleY = dis.readFloat();
         float rotation = dis.readFloat();
-        return new GameObject(id, x, y, scale, rotation);
+        int imageIndex = dis.readInt();
+        UUID id = new UUID(most, least);
+        Vector2 position = new Vector2(x, y);
+        Vector2 scale = new Vector2(scaleX, scaleY);
+        return new GameObject(id, position, scale, rotation);
     }
 }
 
