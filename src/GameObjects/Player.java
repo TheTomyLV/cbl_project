@@ -32,6 +32,7 @@ public class Player extends GameObject {
     public void update(float deltaTime) {
         time += deltaTime;
 
+        // Movement
         if (Input.isKeyPressed(KeyEvent.VK_W)) {
             velocity.y -= deltaTime * speed;
         }
@@ -45,12 +46,12 @@ public class Player extends GameObject {
             velocity.x += deltaTime * speed;
         }
 
-
         position = position.add(velocity);
         velocity = velocity.multiply(0.99f); // Hacky for now
         rotation = Input.mouse.getWorldPosition().subtract(position).getRotation();
         rotation = (float) Math.toDegrees(rotation);
 
+        // Shooting
         if (Input.mouse.isClicked(0) && time >= 0.1) {
             AudioPlayer.playAudio(shooting, false);
             Engine.addObject(new Bullet(position, rotation));

@@ -1,5 +1,3 @@
-import java.util.Vector;
-
 import Engine.Engine;
 import Engine.Sprite;
 import Engine.Vector2;
@@ -11,18 +9,20 @@ import Scenes.LobbyScene;
 public class App {
 
     public void run() {
-        Engine engine = new Engine();
-        engine.setup();
+        // Initializes engine
+        Engine.start();
 
+        // Load all art assets
         String artAssetPath = "src\\Assets\\art\\";
         Sprite.loadImage("player", artAssetPath + "player.png", new Vector2(0.5f, 0.5f));
         Sprite.loadImage("bullet", artAssetPath + "bullet.png", new Vector2(0.5f, 0.5f));
         
-        LobbyScene lobbyScene = new LobbyScene();
-        Engine.changeScene(lobbyScene);
+        // Load starting scene
+        Engine.changeScene(new LobbyScene());
 
-        while (engine.isRunning()) {
-            engine.update();
+        // Update loop
+        while (Engine.isRunning()) {
+            Engine.update();
         }
     }
 

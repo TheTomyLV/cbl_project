@@ -5,6 +5,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -56,7 +57,9 @@ public class Client extends Thread {
         if (!running) {
             return;
         }
-        Packet dataPacket = new Packet(clientId, gameObjects);
+        HashMap<ClientData, ArrayList<GameObject>> gameObjectMap = new HashMap<>();
+        gameObjectMap.put(null, gameObjects);
+        Packet dataPacket = new Packet(clientId, gameObjectMap);
         sendingBuf = dataPacket.getBytes();
         DatagramPacket packet = new DatagramPacket(sendingBuf, sendingBuf.length, address, port);
         

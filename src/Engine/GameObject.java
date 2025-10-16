@@ -137,7 +137,7 @@ public class GameObject implements Serializable {
     public byte[] toBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
-
+        
         dos.writeLong(id.getMostSignificantBits());
         dos.writeLong(id.getLeastSignificantBits());
         dos.writeFloat(position.x);

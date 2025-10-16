@@ -15,56 +15,46 @@ import java.util.Vector;
 import javax.swing.JFrame;
 
 public class Engine {
-    Server server;
-    Client client;
-    Scene currentScene;
-    JFrame jFrame;
-    boolean running;
-    Duration deltaTime = Duration.ZERO;
-    Instant beginTime = Instant.now();
-    Duration tick = Duration.ZERO;
-    static Engine engine;
+    private static Server server;
+    private static Client client;
+    private static Scene currentScene;
+    private static JFrame jFrame;
+    private static boolean running;
+    private static Duration deltaTime = Duration.ZERO;
+    private static Instant beginTime = Instant.now();
+    private static Duration tick = Duration.ZERO;
+    private static Input input = new Input();
 
-    public Engine() {
-        engine = this;
-    }
-
-    public void setup() {
+    public static void start() {
         jFrame = new JFrame();
         jFrame.setSize(500, 600);
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setTitle("Game");
-        Input input = new Input();
         jFrame.addKeyListener(input);
-        jFrame.addMouseListener(input);
-        jFrame.addMouseMotionListener(input);
+        
         new Camera();
         running = true;
     }
 
     public static Scene getCurrentScene() {
-        return engine.currentScene;
+        return Engine.currentScene;
     }
 
-    protected static Engine getEngine() {
-        return engine;
-    }
-
-    public boolean isRunning() {
+    public static boolean isRunning() {
         return running;
     }
 
     public static float getDeltaTIme() {
-        return engine.deltaTime.toNanos() / 1_000_000_000f;
+        return Engine.deltaTime.toNanos() / 1_000_000_000f;
     }
 
-    private void networkUpdate() {
-        if (getEngine().client != null) {
-            getEngine().client.sendGameObjects(getCurrentScene().getGameObjects());
+    private static void networkUpdate() {
+        if (Engine.client != null) {
+            Engine.client.sendGameObjects(getCurrentScene().getGameObjects());
 
             // receiving server objects
-            ArrayList<GameObject> serverObjects = getEngine().client.gameObjects;
+            ArrayList<GameObject> serverObjects = Engine.client.gameObjects;
             ArrayList<GameObject> localObjects = getCurrentScene().getServerObject();
             for (GameObject gameObject : serverObjects) {
                 boolean found = false;
@@ -82,18 +72,23 @@ public class Engine {
                 if (!getCurrentScene().getGameObjects().contains(gameObject)) {
                     Engine.getCurrentScene().addServerObject(gameObject);
                 }
-                    
+            }
+
+            for (int i = 0; i < localObjects.size(); i++) {
+                if (!serverObjects.contains(localObjects.get(i))) {
+                    localObjects.remove(i);
+                }
             }
 
         }
-        if (getEngine().server != null) {
-            getEngine().server.sendServerObjects(getEngine().server.gameObjects);
+        if (Engine.server != null) {
+            Engine.server.sendServerObjects(Engine.server.getGameObjects());
         }
     }
 
-    public void update() {
+    public static void update() {
         if (tick.toMillis() >= 16) {
-            networkUpdate();
+            Engine.networkUpdate();
             tick = Duration.ZERO;
         }
 
@@ -111,14 +106,18 @@ public class Engine {
      */
     public static void changeScene(Scene scene) {
         if (getCurrentScene() != null) {
-            getEngine().jFrame.remove(Engine.getCurrentScene());
+            Engine.getCurrentScene().removeMouseListener(input);
+            Engine.getCurrentScene().removeMouseMotionListener(input);
+            Engine.jFrame.remove(Engine.getCurrentScene());
         }
         
-        getEngine().currentScene = scene;
+        Engine.currentScene = scene;
         
-        getEngine().jFrame.add(scene);
-        getEngine().jFrame.validate();
-        getEngine().jFrame.requestFocus();
+        Engine.jFrame.add(scene);
+        scene.addMouseMotionListener(input);
+        scene.addMouseListener(input);
+        Engine.jFrame.validate();
+        Engine.jFrame.requestFocus();
     }
 
     /**
@@ -127,11 +126,11 @@ public class Engine {
      * @return true if successful server is made
      */
     public static boolean runServer(int port) {
-        getEngine().server = new Server();
+        Engine.server = new Server();
         try {
-            getEngine().server.startServer(port);
+            Engine.server.startServer(port);
         } catch (Exception e) {
-            getEngine().server = null;
+            Engine.server = null;
             return false;
         }
 
@@ -145,11 +144,11 @@ public class Engine {
      * @return true if joined the host
      */
     public static boolean runClient(String host, int port) {
-        getEngine().client = new Client();
+        Engine.client = new Client();
         try {
-            getEngine().client.connect(host, port);
+            Engine.client.connect(host, port);
         } catch (Exception e) {
-            getEngine().client = null;
+            Engine.client = null;
             return false;
         }
         return true;

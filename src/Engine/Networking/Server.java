@@ -4,6 +4,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.UUID;
 
 import Engine.Engine;
@@ -17,10 +20,15 @@ public class Server extends Thread {
     private int port;
     private boolean running;
     private byte[] buf = new byte[8192];
-    private byte[] sendingBuf = new byte[8192];
-    public ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
-    ArrayList<ClientData> clients = new ArrayList<ClientData>();
+    private byte[] sendingBuf;
+    private static final int PLAYER_COUNT = 4;
+    private HashMap<ClientData, ArrayList<GameObject>> gameObjects = new HashMap<>();
+    private HashSet<ClientData> clients = new HashSet<>();
     private final UUID serverId = new UUID(0, 0);
+
+    public HashMap<ClientData, ArrayList<GameObject>> getGameObjects() {
+        return gameObjects;
+    }
 
     /**
      * Set a port and start server.
@@ -34,20 +42,15 @@ public class Server extends Thread {
         start();
     }
 
-    public void sendServerObjects(ArrayList<GameObject> serverObjects) {
+    public void sendServerObjects(HashMap<ClientData, ArrayList<GameObject>> serverObjects) {
         if (!running) {
             return;
         }
         Packet dataPacket = new Packet(serverId, serverObjects);
         sendingBuf = dataPacket.getBytes();
 
-        ArrayList<ClientData> clientData = new ArrayList<ClientData>();
-
-        for (ClientData client : clients) {
-            clientData.add(client);
-        }
-
-        for (ClientData client : clientData) {
+        for (Iterator<ClientData> it = clients.iterator(); it.hasNext();) {
+            ClientData client = it.next();
             DatagramPacket packet = new DatagramPacket(sendingBuf, sendingBuf.length, client.getAddress(), client.getPort());
             try {
                 socket.send(packet);
@@ -58,14 +61,18 @@ public class Server extends Thread {
         }
     }
 
-    private void updateGameObjects(ArrayList<GameObject> newGameObjects) {
-        for (GameObject clientObject : newGameObjects) {
+    private void updateGameObjects(ArrayList<GameObject> newGameObjects, ClientData clientData) {
+        ArrayList<GameObject> clientGameObjects = gameObjects.get(clientData);
+        for (Iterator<GameObject> it = newGameObjects.iterator(); it.hasNext();) {
+            GameObject newClientObject = it.next();
             boolean found = false;
-            for (GameObject serverObject : gameObjects) {
-                if (clientObject.equals(serverObject)) {
-                    serverObject.position = clientObject.position;
-                    serverObject.scale = clientObject.scale;
-                    serverObject.rotation = clientObject.rotation;
+
+            for (int i = 0; i < clientGameObjects.size(); i++) {
+                GameObject serverObject = clientGameObjects.get(i);
+                if (newClientObject.equals(serverObject)) {
+                    serverObject.position = newClientObject.position;
+                    serverObject.scale = newClientObject.scale;
+                    serverObject.rotation = newClientObject.rotation;
                     found = true;
                     break;
                 }
@@ -73,7 +80,29 @@ public class Server extends Thread {
             if (found) {
                 continue;
             }
-            gameObjects.add(clientObject);
+            clientGameObjects.add(newClientObject);
+        }
+
+        for (int i = 0; i < clientGameObjects.size(); i++) {
+            GameObject serverObject = clientGameObjects.get(i);
+            boolean found = newGameObjects.contains(serverObject);
+            
+            if (!found) {
+                System.out.println(clientGameObjects.size());
+                clientGameObjects.remove(serverObject);
+                System.out.println(clientGameObjects.size());
+            }
+        }
+    }
+
+    private void addNewClient(ClientData client) {
+        if (clients.size() >= PLAYER_COUNT) {
+            return;
+        }
+
+        if (!clients.contains(client)) {
+            clients.add(client);
+            gameObjects.put(client, new ArrayList<>());
         }
     }
 
@@ -92,19 +121,11 @@ public class Server extends Thread {
 
             ClientData currentClient = new ClientData(packet.getAddress(), packet.getPort(), dataPacket.id);
 
-            boolean newClient = true;
-            for (ClientData client : clients) {
-                if (client.equals(currentClient)) {
-                    newClient = false;
-                }
-            }
-
-            if (newClient) {
-                clients.add(currentClient);
-            }
+            addNewClient(currentClient);
             
-            updateGameObjects(dataPacket.getGameObjects());
-            
+            if (clients.contains(currentClient)) {
+                updateGameObjects(dataPacket.getGameObjects(), currentClient);
+            }
         }
         socket.close();
     }

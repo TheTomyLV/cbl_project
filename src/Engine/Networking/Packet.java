@@ -10,7 +10,9 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +33,7 @@ public class Packet {
         }
     }
 
-    public Packet(UUID senderId, ArrayList<GameObject> gameObjects) {
+    public Packet(UUID senderId, HashMap<ClientData, ArrayList<GameObject>> gameObjects) {
         try {
             serializeData(senderId, gameObjects);
         } catch (Exception e) {
@@ -48,7 +50,7 @@ public class Packet {
         return data;
     }
 
-    private void serializeData(UUID id, ArrayList<GameObject> gameObjects) throws IOException {
+    private void serializeData(UUID id, HashMap<ClientData, ArrayList<GameObject>> gameObjects) throws IOException {
         if (gameObjects == null) {
             return;
         }
@@ -59,14 +61,16 @@ public class Packet {
         dos.writeLong(id.getMostSignificantBits());
         dos.writeLong(id.getLeastSignificantBits());
 
-        // Write object count
-        dos.writeInt(gameObjects.size());
-
         // Serialize all objects
         List<byte[]> serializedObjects = new ArrayList<>();
-        for (GameObject obj : gameObjects) {
-            serializedObjects.add(obj.toBytes());
+        for (Iterator<ArrayList<GameObject>> it = gameObjects.values().iterator(); it.hasNext();) {
+            for (GameObject obj : it.next()) {
+                serializedObjects.add(obj.toBytes());
+            }
         }
+
+        // Write object count
+        dos.writeInt(serializedObjects.size());
 
         // Calculate and write start indecies
         int currentOffset = 0;

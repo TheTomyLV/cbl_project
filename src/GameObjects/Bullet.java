@@ -6,7 +6,7 @@ import Engine.Vector2;
 
 public class Bullet extends GameObject {
     float time = 0f;
-    float speed = 500f;
+    float speed = 100f;
 
     public Bullet(Vector2 position, float rotation) {
         this.position = position;
@@ -22,9 +22,10 @@ public class Bullet extends GameObject {
     @Override
     protected void update(float deltaTime) {
         time += deltaTime;
-        position = position.add(Vector2.fromRotation((float) Math.toRadians(rotation)).multiply(speed * deltaTime));
+        float rotationInRad = (float) Math.toRadians(rotation);
+        position = position.add(Vector2.fromRotation(rotationInRad).multiply(speed * deltaTime));
 
-        if (time >= 5) {
+        if (time >= 2) {
             Engine.destroy(this);
         }
     }
