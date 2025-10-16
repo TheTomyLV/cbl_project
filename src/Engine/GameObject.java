@@ -34,8 +34,8 @@ public class GameObject implements Serializable {
         setup();
     }
 
-    GameObject(UUID id, Vector2 position, Vector2 scale, float rotation) {
-        loadImage("src\\Assets\\art\\Player.png");
+    GameObject(UUID id, Vector2 position, Vector2 scale, float rotation, int imageIndex) {
+        setSprite(imageIndex);
         this.id = id;
         this.position = position;
         this.scale = scale;
@@ -65,8 +65,14 @@ public class GameObject implements Serializable {
      * Load all the required images for this component.
      * @param path path to the image
      */
-    public void loadImage(String path) {
-        currentImage = Sprite.getImage(path);
+    public void setSprite(String name) {
+        currentSprite = Sprite.getSprite(name);
+        currentImage = currentSprite.getImage();
+    }
+
+    private void setSprite(int index) {
+        currentSprite = Sprite.getSpriteFromIndex(index);
+        currentImage = currentSprite.getImage();
     }
 
     public void setRotation(float degrees) {
@@ -139,7 +145,7 @@ public class GameObject implements Serializable {
         dos.writeFloat(scale.x);
         dos.writeFloat(scale.y);
         dos.writeFloat(rotation);
-        dos.writeInt(0);
+        dos.writeInt(currentSprite.getIndex());
 
         dos.flush();
         return baos.toByteArray();
@@ -158,7 +164,7 @@ public class GameObject implements Serializable {
         UUID id = new UUID(most, least);
         Vector2 position = new Vector2(x, y);
         Vector2 scale = new Vector2(scaleX, scaleY);
-        return new GameObject(id, position, scale, rotation);
+        return new GameObject(id, position, scale, rotation, imageIndex);
     }
 }
 

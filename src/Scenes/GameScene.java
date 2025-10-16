@@ -10,5 +10,4 @@ public class GameScene extends Scene {
     public void setupScene() {
         addObject(new Player(new Vector2(230, 230)));
     }
-    
 }

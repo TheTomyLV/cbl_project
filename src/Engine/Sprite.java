@@ -17,52 +17,64 @@ import javax.imageio.ImageIO;
  * Class for managing images for gameObject rendering.
  */
 public class Sprite {
+    Vector2 pivot;
+    BufferedImage image;
+    int index;
+
+    Sprite(BufferedImage image, Vector2 pivot, int index) {
+        this.image = image;
+        if (pivot == null) {
+            this.pivot = new Vector2(0.5f, 0.5f);
+        }
+        this.pivot = pivot;
+        this.index = index;
+    }
+
+    BufferedImage getImage() {
+        return image;
+    }
+
+    Vector2 getPivot() {
+        return pivot;
+    }
+
+    int getIndex() {
+        return index;
+    }
     
-    static HashMap<Integer, BufferedImage> images = new HashMap<>();
-    static HashMap<String, Integer> fileIndexMap = new HashMap<>();
+    static HashMap<Integer, Sprite> sprites = new HashMap<>();
+    static HashMap<String, Integer> spriteIndexMap = new HashMap<>();
     /**
      * Loads image and stores it in cache for multiple uses.
      * @param path path to image
      * @return bufferedImage
      */
-    public static BufferedImage getImage(String path) {
-        if (!fileIndexMap.containsKey(path)) {
+    public static Sprite getSprite(String name) {
+        if (!spriteIndexMap.containsKey(name)) {
             return null;
         }
 
-        int index = fileIndexMap.get(path);
-        return images.get(index);
+        int index = spriteIndexMap.get(name);
+        return sprites.get(index);
     }
 
-    private static BufferedImage loadImage(Path path) {
+    public static Sprite getSpriteFromIndex(int index) {
+        if (!sprites.containsKey(index)) {
+            return null;
+        }
+        return sprites.get(index);
+    }
+
+    public static void loadImage(String name, String path, Vector2 pivot) {
         try {
-            BufferedImage image = ImageIO.read(path.toFile());
-            return image;
+            BufferedImage image = ImageIO.read(new File(path));
+            if (image != null) {
+                int index = spriteIndexMap.size();
+                sprites.put(index, new Sprite(image, pivot, index));
+                spriteIndexMap.put(name, index);
+            }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void loadAssets(String directory) {
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(directory))) {
-            for (Path path : stream) {
-                if (Files.isDirectory(path)) {
-                    loadAssets(path.toString());
-                } else {
-                    BufferedImage image = loadImage(path);
-
-                    if (image != null) {
-                        images.put(fileIndexMap.size(), image);
-                        fileIndexMap.put(path.toString(), fileIndexMap.size());
-                    }
-
-
-                }
-            }
-        } catch (Exception e) {
-            return;
         }
     }
 }

@@ -42,7 +42,7 @@ public class Client extends Thread {
      */
     public void connect(String host, int port) throws Exception {
         socket = new DatagramSocket();
-        address = InetAddress.getByName("localhost");
+        address = InetAddress.getByName(host);
         this.port = port;
         running = true;
         start();

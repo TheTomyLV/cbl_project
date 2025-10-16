@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
 public class Player extends GameObject {
 
     double time = 0;
-    float speed = 5.0f;
+    float speed = 2.0f;
     Vector2 velocity = new Vector2(0f, 0f);
     AudioClip shooting = new AudioClip("src\\Assets\\audio\\shoot.wav");
 
@@ -23,7 +23,7 @@ public class Player extends GameObject {
 
     @Override
     protected void setup() {
-        loadImage("src\\Assets\\art\\Player.png");
+        setSprite("player");
         //setRotation(45);
         scale = new Vector2(0.1f, 0.1f);
     }
