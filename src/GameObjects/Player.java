@@ -2,6 +2,7 @@ package GameObjects;
 
 
 import Engine.Camera;
+import Engine.Engine;
 import Engine.GameObject;
 import Engine.Inputs.Input;
 import Engine.Sound.AudioClip;
@@ -43,15 +44,18 @@ public class Player extends GameObject {
         if (Input.isKeyPressed(KeyEvent.VK_D)) {
             velocity.x += deltaTime * speed;
         }
-        if (Input.mouse.isClicked(0) && time >= 0.1) {
-            AudioPlayer.playAudio(shooting, false);
-            time = 0;
-        }
+
 
         position = position.add(velocity);
         velocity = velocity.multiply(0.99f); // Hacky for now
         rotation = Input.mouse.getWorldPosition().subtract(position).getRotation();
         rotation = (float) Math.toDegrees(rotation);
+
+        if (Input.mouse.isClicked(0) && time >= 0.1) {
+            AudioPlayer.playAudio(shooting, false);
+            Engine.addObject(new Bullet(position, rotation));
+            time = 0;
+        }
 
         Camera.currentCamera.position = position;
     }

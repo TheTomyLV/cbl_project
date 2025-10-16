@@ -3,6 +3,9 @@ package Engine;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 /**
@@ -11,6 +14,9 @@ import javax.swing.*;
 public abstract class Scene extends JPanel {
     ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
     ArrayList<GameObject> serverObjects = new ArrayList<GameObject>();
+    ArrayList<GameObject> toAddObject = new ArrayList<>();
+    ArrayList<GameObject> toRemoveObject = new ArrayList<>();
+
 
     /**
      * Set scene layout and call setupScene.
@@ -21,15 +27,19 @@ public abstract class Scene extends JPanel {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    protected synchronized void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        for (GameObject gameObject : gameObjects) {
-            gameObject.draw((Graphics2D) g);
+        draw(g);
+    }
+
+    private void draw(Graphics g) {
+        for (int i = 0; i < gameObjects.size(); i++) {
+            gameObjects.get(i).draw((Graphics2D) g);
         }
 
-        for (GameObject gameObject : serverObjects) {
-            gameObject.draw((Graphics2D) g);
+        for (int i = 0; i < serverObjects.size(); i++) {
+            serverObjects.get(i).draw((Graphics2D) g);
         }
     }
 
@@ -37,24 +47,43 @@ public abstract class Scene extends JPanel {
      * Internal method to call update function for all scene gameObjects.
      */
     void update() {
-        for (GameObject gameObject : gameObjects) {
+
+        for (Iterator<GameObject> it = gameObjects.iterator(); it.hasNext();) {
+            GameObject gameObject = it.next();
             gameObject.update(Engine.getDeltaTIme());
         }
 
-        for (GameObject gameObject : serverObjects) {
+        for (Iterator<GameObject> it = serverObjects.iterator(); it.hasNext();) {
+            GameObject gameObject = it.next();
             gameObject.update(Engine.getDeltaTIme());
         }
 
+        for (GameObject gameObject : toAddObject) {
+            if (!gameObjects.contains(gameObject)) {
+                gameObjects.add(gameObject);
+            }
+        }
+        toAddObject.clear();
+
+        for (GameObject gameObject : toRemoveObject) {
+            if (gameObjects.contains(gameObject)) {
+                gameObject.onDestroy();
+                gameObjects.remove(gameObject);
+            }
+        }
+        toRemoveObject.clear();
+
+        Graphics2D g2d = (Graphics2D) getGraphics();
+        if (g2d == null) {
+            return;
+        }
         repaint();
     }
 
     public abstract void setupScene();
 
     public void addObject(GameObject gameObject) {
-        if (gameObjects.contains(gameObject)) {
-            return;
-        }
-        gameObjects.add(gameObject);
+        toAddObject.add(gameObject);
     }
 
     protected void addServerObject(GameObject gameObject) {
@@ -69,10 +98,7 @@ public abstract class Scene extends JPanel {
      * @param gameObject gameObject that is scene
      */
     void destroyObject(GameObject gameObject) {
-        if (gameObjects.contains(gameObject)) {
-            gameObject.onDestroy();
-            gameObjects.remove(gameObject);
-        }
+        toRemoveObject.add(gameObject);
     }
 
     protected void destroyServerObject(GameObject gameObject) {

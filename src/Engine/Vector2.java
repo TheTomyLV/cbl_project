@@ -61,4 +61,8 @@ public class Vector2 {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
+    public static Vector2 fromRotation(float roation) {
+        return new Vector2((float) Math.cos(roation), (float) Math.sin(roation));
+    }
 }

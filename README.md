@@ -20,7 +20,8 @@ Learn how a game engine functions
     - [ ] Server.java
     - [ ] Packet.java - needs to send the current scene and also add events
     - [ ] AudioClip.java and AudioPlayer.java needs to be handled better, as the initial loading of the audio hangs the game
-    - [ ] Engine.java
+    - [ ] Engine.java - needs to make adding and removing objects work
+    - [ ] Scene.java - needs to only paint gameObjects on update call
     - [ ] Sprite.java - Needs to be able to get the image index for serialization
 
 - [ ] Setup

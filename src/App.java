@@ -18,7 +18,6 @@ public class App {
         while (engine.isRunning()) {
             engine.update();
         }
-        
     }
 
     public static void main(String[] args) throws Exception {
