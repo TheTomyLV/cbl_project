@@ -13,10 +13,10 @@ public class App {
     public void run() {
         Engine engine = new Engine();
         engine.setup();
-        
+
         String artAssetPath = "src\\Assets\\art\\";
-        Sprite.loadImage("player", artAssetPath + "player.png", new Vector2(0.5f, 1f));
-        Sprite.loadImage("bullet", artAssetPath + "bullet.png", new Vector2(0.5f, 1f));
+        Sprite.loadImage("player", artAssetPath + "player.png", new Vector2(0.5f, 0.5f));
+        Sprite.loadImage("bullet", artAssetPath + "bullet.png", new Vector2(0.5f, 0.5f));
         
         LobbyScene lobbyScene = new LobbyScene();
         Engine.changeScene(lobbyScene);

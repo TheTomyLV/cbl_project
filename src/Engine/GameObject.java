@@ -95,7 +95,7 @@ public class GameObject implements Serializable {
         at.translate(panelPos.x, panelPos.y);
         at.rotate(Math.toRadians(rotation));
         at.scale(scale.x, scale.y);
-        at.translate(-currentImage.getWidth() / 2, -currentImage.getHeight() / 2);
+        at.translate(-currentImage.getWidth() * currentSprite.pivot.x, -currentImage.getHeight() * currentSprite.pivot.y);
 
         g2d.drawImage(currentImage, at, null);
     }
