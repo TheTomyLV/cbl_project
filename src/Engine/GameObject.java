@@ -35,7 +35,9 @@ public class GameObject implements Serializable {
     }
 
     GameObject(UUID id, Vector2 position, Vector2 scale, float rotation, int imageIndex) {
-        setSprite(imageIndex);
+        if (imageIndex != -1) {
+            setSprite(imageIndex);
+        }
         this.id = id;
         this.position = position;
         this.scale = scale;
@@ -112,7 +114,7 @@ public class GameObject implements Serializable {
         return;
     }
 
-    protected void update(float deltaTime) {
+    public void update(float deltaTime) {
         if (getClass() != GameObject.class) {
             return;
         }
@@ -145,8 +147,11 @@ public class GameObject implements Serializable {
         dos.writeFloat(scale.x);
         dos.writeFloat(scale.y);
         dos.writeFloat(rotation);
-        dos.writeInt(currentSprite.getIndex());
-
+        if (currentSprite == null) {
+            dos.writeInt(-1);
+        } else {
+            dos.writeInt(currentSprite.getIndex());
+        }
         dos.flush();
         return baos.toByteArray();
     }

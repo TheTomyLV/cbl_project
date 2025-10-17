@@ -1,16 +1,12 @@
 package Engine.Networking;
 
+import Engine.GameObject;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.UUID;
-
-import Engine.GameObject;
-import Engine.Engine;
 
 /**
  * A client class to join a server.
@@ -24,7 +20,7 @@ public class Client extends Thread {
 
     public ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
 
-    private byte[] sendingBuf = new byte[8192];
+    private byte[] sendingBuf;
     private byte[] receivingBuf = new byte[8192];
 
     public Client() {

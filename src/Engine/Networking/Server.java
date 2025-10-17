@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import Engine.Engine;
 import Engine.GameObject;
+import Engine.Scene;
 
 /**
  * A server class to send and receive data.
@@ -21,13 +22,21 @@ public class Server extends Thread {
     private boolean running;
     private byte[] buf = new byte[8192];
     private byte[] sendingBuf;
-    private static final int PLAYER_COUNT = 4;
-    private HashMap<ClientData, ArrayList<GameObject>> gameObjects = new HashMap<>();
+    private HashMap<ClientData, ArrayList<GameObject>> allObjects = new HashMap<>();
     private HashSet<ClientData> clients = new HashSet<>();
     private final UUID serverId = new UUID(0, 0);
+    private float tick = 0f;
+    private Scene currentScene;
 
-    public HashMap<ClientData, ArrayList<GameObject>> getGameObjects() {
-        return gameObjects;
+    private static Server server;
+    private static final int PLAYER_COUNT = 4;
+
+    public Server() {
+        Server.server = this;
+    }
+
+    public HashMap<ClientData, ArrayList<GameObject>> getAllObjects() {
+        return allObjects;
     }
 
     /**
@@ -36,13 +45,52 @@ public class Server extends Thread {
      * @throws Exception throws an exception if server cannot be opened
      */
     public void startServer(int port) throws Exception {
+        allObjects.put(null, new ArrayList<>());
         socket = new DatagramSocket(port);
         this.port = port;
         running = true;
         start();
     }
 
-    public void sendServerObjects(HashMap<ClientData, ArrayList<GameObject>> serverObjects) {
+    public void update(float deltaTime) {
+        tick += deltaTime;
+        if (tick >= 0.0016) {
+            sendServerObjects(allObjects);
+            tick = 0;
+        }
+        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
+
+        for (int i = 0; i < gameObjects.size(); i++) {
+            GameObject gameObject = gameObjects.get(i);
+            gameObject.update(deltaTime);
+        }
+    }
+
+    public static void addObject(GameObject gameObject) {
+        if (Server.server == null) {
+            return;
+        }
+        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
+        if (!gameObjects.contains(gameObject)) {
+            gameObjects.add(gameObject);
+        }
+    }
+
+    public static void removeObject(GameObject gameObject) {
+        if (Server.server == null) {
+            return;
+        }
+        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
+        if (gameObjects.contains(gameObject)) {
+            gameObjects.remove(gameObject);
+        }
+    }
+
+    public static void changeScene(Scene scene) {
+        Server.server.currentScene = scene;
+    }
+
+    private void sendServerObjects(HashMap<ClientData, ArrayList<GameObject>> serverObjects) {
         if (!running) {
             return;
         }
@@ -62,7 +110,7 @@ public class Server extends Thread {
     }
 
     private void updateGameObjects(ArrayList<GameObject> newGameObjects, ClientData clientData) {
-        ArrayList<GameObject> clientGameObjects = gameObjects.get(clientData);
+        ArrayList<GameObject> clientGameObjects = allObjects.get(clientData);
         for (Iterator<GameObject> it = newGameObjects.iterator(); it.hasNext();) {
             GameObject newClientObject = it.next();
             boolean found = false;
@@ -88,9 +136,7 @@ public class Server extends Thread {
             boolean found = newGameObjects.contains(serverObject);
             
             if (!found) {
-                System.out.println(clientGameObjects.size());
                 clientGameObjects.remove(serverObject);
-                System.out.println(clientGameObjects.size());
             }
         }
     }
@@ -102,7 +148,7 @@ public class Server extends Thread {
 
         if (!clients.contains(client)) {
             clients.add(client);
-            gameObjects.put(client, new ArrayList<>());
+            allObjects.put(client, new ArrayList<>());
         }
     }
 
@@ -120,7 +166,6 @@ public class Server extends Thread {
             Packet dataPacket = new Packet(packet.getData());
 
             ClientData currentClient = new ClientData(packet.getAddress(), packet.getPort(), dataPacket.id);
-
             addNewClient(currentClient);
             
             if (clients.contains(currentClient)) {

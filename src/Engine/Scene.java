@@ -46,16 +46,16 @@ public abstract class Scene extends JPanel {
     /**
      * Internal method to call update function for all scene gameObjects.
      */
-    void update() {
+    void update(float deltaTime) {
 
         for (Iterator<GameObject> it = gameObjects.iterator(); it.hasNext();) {
             GameObject gameObject = it.next();
-            gameObject.update(Engine.getDeltaTIme());
+            gameObject.update(deltaTime);
         }
 
         for (Iterator<GameObject> it = serverObjects.iterator(); it.hasNext();) {
             GameObject gameObject = it.next();
-            gameObject.update(Engine.getDeltaTIme());
+            gameObject.update(deltaTime);
         }
 
         for (GameObject gameObject : toAddObject) {

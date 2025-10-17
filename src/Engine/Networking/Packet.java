@@ -29,7 +29,7 @@ public class Packet {
         try {
             deserializeData(bytes);
         } catch (Exception e) {
-            System.out.println("Couldn't deserialize data");
+            e.printStackTrace();
         }
     }
 
@@ -38,7 +38,7 @@ public class Packet {
             serializeData(senderId, gameObjects);
         } catch (Exception e) {
             data = new byte[0];
-            System.out.println("Couldn't serialize gameObjects");;
+            e.printStackTrace();
         }
     }
 
@@ -64,8 +64,9 @@ public class Packet {
         // Serialize all objects
         List<byte[]> serializedObjects = new ArrayList<>();
         for (Iterator<ArrayList<GameObject>> it = gameObjects.values().iterator(); it.hasNext();) {
-            for (GameObject obj : it.next()) {
-                serializedObjects.add(obj.toBytes());
+            ArrayList<GameObject> entityGameObjects = it.next();
+            for (int i = 0; i < entityGameObjects.size(); i++) {
+                serializedObjects.add(entityGameObjects.get(i).toBytes());
             }
         }
 

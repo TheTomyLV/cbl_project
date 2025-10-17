@@ -16,6 +16,7 @@ public class App {
         String artAssetPath = "src\\Assets\\art\\";
         Sprite.loadImage("player", artAssetPath + "player.png", new Vector2(0.5f, 0.5f));
         Sprite.loadImage("bullet", artAssetPath + "bullet.png", new Vector2(0.5f, 0.5f));
+        Sprite.loadImage("zombie", artAssetPath + "zombie.png", new Vector2(0.5f, 0.5f));
         
         // Load starting scene
         Engine.changeScene(new LobbyScene());

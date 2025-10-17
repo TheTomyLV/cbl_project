@@ -20,7 +20,7 @@ public class Bullet extends GameObject {
     }
 
     @Override
-    protected void update(float deltaTime) {
+    public void update(float deltaTime) {
         time += deltaTime;
         float rotationInRad = (float) Math.toRadians(rotation);
         position = position.add(Vector2.fromRotation(rotationInRad).multiply(speed * deltaTime));

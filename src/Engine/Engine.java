@@ -21,8 +21,8 @@ public class Engine {
     private static JFrame jFrame;
     private static boolean running;
     private static Duration deltaTime = Duration.ZERO;
-    private static Instant beginTime = Instant.now();
     private static Duration tick = Duration.ZERO;
+    private static Instant beginTime = Instant.now();
     private static Input input = new Input();
 
     public static void start() {
@@ -49,7 +49,7 @@ public class Engine {
         return Engine.deltaTime.toNanos() / 1_000_000_000f;
     }
 
-    private static void networkUpdate() {
+    private static void ClientNetworkUpdate() {
         if (Engine.client != null) {
             Engine.client.sendGameObjects(getCurrentScene().getGameObjects());
 
@@ -79,20 +79,20 @@ public class Engine {
                     localObjects.remove(i);
                 }
             }
-
-        }
-        if (Engine.server != null) {
-            Engine.server.sendServerObjects(Engine.server.getGameObjects());
         }
     }
 
     public static void update() {
         if (tick.toMillis() >= 16) {
-            Engine.networkUpdate();
+            Engine.ClientNetworkUpdate();
             tick = Duration.ZERO;
         }
+        
+        if (Engine.server != null) {
+            Engine.server.update(Engine.getDeltaTIme());
+        }
 
-        currentScene.update();
+        currentScene.update(Engine.getDeltaTIme());
         
 
         deltaTime = Duration.between(beginTime, Instant.now());
