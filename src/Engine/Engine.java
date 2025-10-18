@@ -2,6 +2,8 @@ package Engine;
 
 import Engine.Inputs.Input;
 import Engine.Networking.Client;
+import Engine.Networking.Network;
+import Engine.Networking.NetworkHandleRegister;
 import Engine.Networking.Server;
 import Engine.Sound.AudioPlayer;
 

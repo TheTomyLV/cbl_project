@@ -1,10 +1,11 @@
 package GameObjects;
 
-
 import Engine.Camera;
 import Engine.Engine;
 import Engine.GameObject;
 import Engine.Inputs.Input;
+import Engine.Networking.NetEvent;
+import Engine.Networking.Server;
 import Engine.Sound.AudioClip;
 import Engine.Sound.AudioPlayer;
 import Engine.Vector2;
@@ -19,6 +20,11 @@ public class Player extends GameObject {
 
     public Player(Vector2 position) {
         this.position = position;
+    }
+
+    @NetEvent("shoot")
+    public static void shoot(float rotation) {
+        Server.addObject(new Bullet(new Vector2(0f, 0f), rotation));
     }
 
     @Override

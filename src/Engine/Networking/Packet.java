@@ -1,22 +1,15 @@
 package Engine.Networking;
 
+import Engine.GameObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
-
-import Engine.GameObject;
 
 public class Packet {
 
@@ -61,28 +54,20 @@ public class Packet {
         dos.writeLong(id.getMostSignificantBits());
         dos.writeLong(id.getLeastSignificantBits());
 
-        // Serialize all objects
-        List<byte[]> serializedObjects = new ArrayList<>();
+        // Get object count
+        int objectCount = 0;
+        for (Iterator<ArrayList<GameObject>> it = gameObjects.values().iterator(); it.hasNext();) {
+            objectCount += it.next().size();
+        }
+
+        dos.writeInt(objectCount);
+
+        // Serialize objects
         for (Iterator<ArrayList<GameObject>> it = gameObjects.values().iterator(); it.hasNext();) {
             ArrayList<GameObject> entityGameObjects = it.next();
             for (int i = 0; i < entityGameObjects.size(); i++) {
-                serializedObjects.add(entityGameObjects.get(i).toBytes());
+                entityGameObjects.get(i).toOutputStream(dos);
             }
-        }
-
-        // Write object count
-        dos.writeInt(serializedObjects.size());
-
-        // Calculate and write start indecies
-        int currentOffset = 0;
-        for (byte[] objBytes : serializedObjects) {
-            dos.writeInt(currentOffset);
-            currentOffset += objBytes.length;
-        }
-
-        // Write all GameObjects
-        for (byte[] objBytes : serializedObjects) {
-            dos.write(objBytes);
         }
 
         dos.flush();
@@ -100,23 +85,9 @@ public class Packet {
         // Read object count
         int objectCount = dis.readInt();
 
-        // Read offsets
-        int[] offsets = new int[objectCount];
-        for (int i = 0; i < objectCount; i++) {
-            offsets[i] = dis.readInt();
-        }
-
-        // Calculate where object bytes start
-        int headerSize = 16 + 4 + 4 * objectCount; // packetType + objectCount + offsets
-        byte[] objectData = Arrays.copyOfRange(data, headerSize, data.length);
-
         ArrayList<GameObject> objects = new ArrayList<GameObject>();
         for (int i = 0; i < objectCount; i++) {
-            int start = offsets[i];
-            int end = (i == objectCount - 1) ? objectData.length : offsets[i + 1];
-
-            byte[] objBytes = Arrays.copyOfRange(objectData, start, end);
-            GameObject obj = GameObject.fromBytes(objBytes);
+            GameObject obj = GameObject.fromInputStream(dis);
             objects.add(obj);
         }
 

@@ -1,6 +1,7 @@
 import Engine.Engine;
 import Engine.Sprite;
 import Engine.Vector2;
+import Engine.Networking.NetworkHandleRegister;
 import Scenes.LobbyScene;
 
 /**
@@ -11,6 +12,9 @@ public class App {
     public void run() {
         // Initializes engine
         Engine.start();
+
+        // Register netowork events
+        NetworkHandleRegister.registerAllGameObjectHandlers("GameObjects");
 
         // Load all art assets
         String artAssetPath = "src\\Assets\\art\\";

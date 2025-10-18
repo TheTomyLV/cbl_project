@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.UUID;
 
+import Engine.Networking.NetMessage;
+import Engine.Networking.Network;
+
 /**
  * Abstract GameObject that exsists in scenes.
  */
@@ -136,10 +139,7 @@ public class GameObject implements Serializable {
      * Unsure for now, but would later use it to send objects over the network.
      * @return packed bytes
      */
-    public byte[] toBytes() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        
+    public void toOutputStream(DataOutputStream dos) throws IOException {
         dos.writeLong(id.getMostSignificantBits());
         dos.writeLong(id.getLeastSignificantBits());
         dos.writeFloat(position.x);
@@ -152,12 +152,9 @@ public class GameObject implements Serializable {
         } else {
             dos.writeInt(currentSprite.getIndex());
         }
-        dos.flush();
-        return baos.toByteArray();
     }
 
-    public static GameObject fromBytes(byte[] data) throws IOException {
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+    public static GameObject fromInputStream(DataInputStream dis) throws IOException {
         long most = dis.readLong();
         long least = dis.readLong();
         float x = dis.readFloat();
@@ -170,6 +167,10 @@ public class GameObject implements Serializable {
         Vector2 position = new Vector2(x, y);
         Vector2 scale = new Vector2(scaleX, scaleY);
         return new GameObject(id, position, scale, rotation, imageIndex);
+    }
+
+    public void sendMessage(String type, Object... args) {
+        NetMessage msg = new NetMessage(type, args);
     }
 }
 
