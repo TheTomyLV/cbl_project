@@ -18,9 +18,13 @@ public class App {
 
         // Load all art assets
         String artAssetPath = "src\\Assets\\art\\";
-        Sprite.loadImage("player", artAssetPath + "player.png", new Vector2(0.5f, 0.5f));
+        Sprite.loadImage("player", artAssetPath + "smith.png", new Vector2(0.25f, 0.5f));
+        Sprite.loadImage("player_shoot1", artAssetPath + "smith_shoot1.png", new Vector2(0.18f, 0.5f));
+        Sprite.loadImage("player_shoot2", artAssetPath + "smith_shoot1.png", new Vector2(0.18f, 0.5f));
+        Sprite.loadImage("player_shoot3", artAssetPath + "smith_shoot1.png", new Vector2(0.18f, 0.5f));
         Sprite.loadImage("bullet", artAssetPath + "bullet.png", new Vector2(0.5f, 0.5f));
-        Sprite.loadImage("zombie", artAssetPath + "zombie.png", new Vector2(0.5f, 0.5f));
+        Sprite.loadImage("zombie", artAssetPath + "descrom.png", new Vector2(0.5f, 0.5f));
+        Sprite.loadImage("grass", artAssetPath + "grass.png", new Vector2(0.5f, 0.5f));
         
         // Load starting scene
         Engine.changeScene(new LobbyScene());

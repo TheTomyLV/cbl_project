@@ -65,7 +65,8 @@ public class Engine {
                     if (gameObject.equals(clientObject)) {
                         clientObject.updateValues(gameObject.position, 
                             gameObject.scale, 
-                            gameObject.rotation);
+                            gameObject.rotation,
+                            gameObject.currentSprite != null ? gameObject.currentSprite.index : -1);
                         found = true;
                         break;
                     }

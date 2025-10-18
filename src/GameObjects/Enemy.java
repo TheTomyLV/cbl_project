@@ -21,7 +21,7 @@ public class Enemy extends GameObject {
     protected void setup() {
         setSprite("zombie");
         //setRotation(45);
-        scale = new Vector2(0.1f, 0.1f);
+        scale = new Vector2(0.15f, 0.15f);
     }
 
     @Override

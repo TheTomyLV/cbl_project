@@ -152,11 +152,15 @@ public class GameObject implements Serializable {
      * @param position position
      * @param scale scale
      * @param rotation rotation
+     * @param spriteIndex sprite index
      */
-    public void updateValues(Vector2 position, Vector2 scale, float rotation) {
+    public void updateValues(Vector2 position, Vector2 scale, float rotation, int spriteIndex) {
         targetPos = position;
         this.scale = scale;
         this.rotation = rotation;
+        if (spriteIndex != -1) {
+            setSprite(spriteIndex);
+        }
     }
 
     /**

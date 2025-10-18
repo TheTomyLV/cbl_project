@@ -137,6 +137,9 @@ public class Server extends Thread {
                     serverObject.position = newClientObject.position;
                     serverObject.scale = newClientObject.scale;
                     serverObject.rotation = newClientObject.rotation;
+                    if (newClientObject.currentSprite != null) {
+                        serverObject.currentSprite = newClientObject.currentSprite;
+                    }
                     found = true;
                     break;
                 }

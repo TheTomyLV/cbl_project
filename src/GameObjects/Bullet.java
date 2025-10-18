@@ -6,7 +6,7 @@ import Engine.Vector2;
 
 public class Bullet extends GameObject {
     float time = 0f;
-    float speed = 100f;
+    float speed = 400f;
 
     public Bullet(Vector2 position, float rotation) {
         this.position = position;
@@ -16,7 +16,7 @@ public class Bullet extends GameObject {
     @Override
     protected void setup() {
         setSprite("bullet");
-        scale = new Vector2(0.05f, 0.05f);
+        scale = new Vector2(0.025f, 0.025f);
     }
 
     @Override
