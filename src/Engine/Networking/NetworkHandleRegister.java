@@ -1,19 +1,27 @@
 package Engine.Networking;
 
+import Engine.GameObject;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.*;
 
-import Engine.GameObject;
 
+/**
+ * Automatic NetEvent registration.
+ */
 public class NetworkHandleRegister {
+    /**
+     * Registers all NetEvents.
+     * @param basePackage package to get the GameObjects from
+     */
     public static void registerAllGameObjectHandlers(String basePackage) {
         try {
             List<Class<?>> classes = getClassesRecursive(basePackage);
 
             for (Class<?> cls : classes) {
-                if (GameObject.class.isAssignableFrom(cls) && !Modifier.isAbstract(cls.getModifiers())) {
+                if (GameObject.class.isAssignableFrom(cls) 
+                    && !Modifier.isAbstract(cls.getModifiers())) {
                     Network.registerHandlersFromClass(cls);
                 }
             }
@@ -46,7 +54,7 @@ public class NetworkHandleRegister {
                 try {
                     classes.add(Class.forName(className));
                 } catch (Throwable ignored) {
-                    // you can print ignored.getMessage() for debugging if needed
+                    ignored.getMessage();
                 }
             }
         }

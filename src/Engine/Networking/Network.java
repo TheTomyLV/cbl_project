@@ -6,13 +6,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * A network event manager class, that handles all the NetEvents.
+ */
 public class Network {
     private static Map<String, Consumer<Object>> handlers = new HashMap<>();
     private static Map<String, Class<?>[]> methodParamTypes = new HashMap<>();
     private static Map<Integer, String> indexMap = new HashMap<>();
     private static Map<String, Integer> typeMap = new HashMap<>();
 
-    public static <T> void registerHandler(String type, Class<?>[] paramTypes, Consumer<T> handler) {
+    /**
+     * Registers a new handle.
+     * @param type NetEvent type
+     * @param paramTypes method parameter types
+     * @param handler method handler
+     */
+    private static void registerHandler(String type, 
+                                        Class<?>[] paramTypes, 
+                                        Consumer<Object> handler) {
         handlers.put(type, (Consumer<Object>) handler);
         methodParamTypes.put(type, paramTypes);
         int index = indexMap.size();
@@ -32,15 +43,23 @@ public class Network {
         return methodParamTypes.get(name);
     }
 
+    /**
+     * Invokes the NetEvent method.
+     * @param msg NetMessage
+     */
     public static void onMessageReceived(NetMessage msg) {
         Consumer<Object> handler = handlers.get(msg.type);
         if (handler != null) {
-            handler.accept(msg.data);
+            handler.accept((Object[]) msg.data);
         } else {
             System.out.println("No handler for type: " + msg.type);
         }
     }
 
+    /**
+     * Checks all methods in a class and registers NetEvents.
+     * @param cls class
+     */
     public static void registerHandlersFromClass(Class<?> cls) {
         for (Method method : cls.getDeclaredMethods()) {
             if (method.isAnnotationPresent(NetEvent.class)) {
@@ -52,26 +71,22 @@ public class Network {
                     System.err.println("Method " + method.getName() + " must be static.");
                     continue;
                 }
-                if (method.getParameterCount() != 1) {
-                    System.err.println("Method " + method.getName() + " must have exactly one parameter.");
-                    continue;
-                }
 
-                // Get parameter type
-                Class<?> paramType = method.getParameterTypes()[0];
                 Class<?>[] paramTypes = method.getParameterTypes();
 
                 // Register the handler
-                registerHandler(messageType, paramTypes, (Object data) -> {
+                registerHandler(messageType, paramTypes, (Object args) -> {
                     try {
-                        // Optionally, cast data to correct type
-                        method.invoke(null, paramType.cast(data));
+                        // Invokes the method with args
+                        method.invoke(null, args);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 });
 
-                System.out.println("Registered handler: " + messageType + " → " + cls.getSimpleName() + "." + method.getName());
+                String message = "Registered handler: \""
+                    + messageType + "\" " + cls.getSimpleName() + "." + method.getName();
+                System.out.println(message);
             }
         }
     }

@@ -3,14 +3,7 @@ package Engine;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.imageio.ImageIO;
 
 /**
@@ -21,6 +14,12 @@ public class Sprite {
     BufferedImage image;
     int index;
 
+    /**
+     * Creates a new sprite with given pivot point.
+     * @param image sprite image
+     * @param pivot image pivot
+     * @param index sprite index
+     */
     Sprite(BufferedImage image, Vector2 pivot, int index) {
         this.image = image;
         if (pivot == null) {
@@ -44,9 +43,10 @@ public class Sprite {
     
     static HashMap<Integer, Sprite> sprites = new HashMap<>();
     static HashMap<String, Integer> spriteIndexMap = new HashMap<>();
+
     /**
      * Loads image and stores it in cache for multiple uses.
-     * @param path path to image
+     * @param name sprite name
      * @return bufferedImage
      */
     public static Sprite getSprite(String name) {
@@ -58,6 +58,11 @@ public class Sprite {
         return sprites.get(index);
     }
 
+    /**
+     * Gets sprite from map with index.
+     * @param index sprite index
+     * @return sprite
+     */
     public static Sprite getSpriteFromIndex(int index) {
         if (!sprites.containsKey(index)) {
             return null;
@@ -65,6 +70,12 @@ public class Sprite {
         return sprites.get(index);
     }
 
+    /**
+     * Loads an image from path and creates a sprite for it.
+     * @param name sprite name
+     * @param path image path
+     * @param pivot image pivot
+     */
     public static void loadImage(String name, String path, Vector2 pivot) {
         try {
             BufferedImage image = ImageIO.read(new File(path));

@@ -4,8 +4,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 /**
@@ -55,7 +53,7 @@ public abstract class Scene extends JPanel {
 
         for (Iterator<GameObject> it = serverObjects.iterator(); it.hasNext();) {
             GameObject gameObject = it.next();
-            gameObject.update(deltaTime);
+            gameObject.serverObjectInterpolation(deltaTime);
         }
 
         for (GameObject gameObject : toAddObject) {
@@ -73,10 +71,6 @@ public abstract class Scene extends JPanel {
         }
         toRemoveObject.clear();
 
-        Graphics2D g2d = (Graphics2D) getGraphics();
-        if (g2d == null) {
-            return;
-        }
         repaint();
     }
 
@@ -86,6 +80,10 @@ public abstract class Scene extends JPanel {
         toAddObject.add(gameObject);
     }
 
+    /**
+     * Adds an object that is received from the server.
+     * @param gameObject gameObject
+     */
     protected void addServerObject(GameObject gameObject) {
         if (serverObjects.contains(gameObject)) {
             return;
@@ -101,6 +99,10 @@ public abstract class Scene extends JPanel {
         toRemoveObject.add(gameObject);
     }
 
+    /**
+     * Destroys an object that is from the server.
+     * @param gameObject gameObject
+     */
     protected void destroyServerObject(GameObject gameObject) {
         if (serverObjects.contains(gameObject)) {
             gameObject.onDestroy();

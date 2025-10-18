@@ -2,20 +2,15 @@ package Engine;
 
 import Engine.Inputs.Input;
 import Engine.Networking.Client;
-import Engine.Networking.Network;
-import Engine.Networking.NetworkHandleRegister;
 import Engine.Networking.Server;
-import Engine.Sound.AudioPlayer;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Vector;
-
 import javax.swing.JFrame;
 
+/**
+ * An engine class to manage the whole game state.
+ */
 public class Engine {
     private static Server server;
     private static Client client;
@@ -27,6 +22,9 @@ public class Engine {
     private static Instant beginTime = Instant.now();
     private static Input input = new Input();
 
+    /**
+     * Setup engine.
+     */
     public static void start() {
         jFrame = new JFrame();
         jFrame.setSize(500, 600);
@@ -51,7 +49,10 @@ public class Engine {
         return Engine.deltaTime.toNanos() / 1_000_000_000f;
     }
 
-    private static void ClientNetworkUpdate() {
+    /**
+     * Updates client server received objects.
+     */
+    private static void clientNetworkUpdate() {
         if (Engine.client != null) {
             Engine.client.sendGameObjects(getCurrentScene().getGameObjects());
 
@@ -62,7 +63,9 @@ public class Engine {
                 boolean found = false;
                 for (GameObject clientObject : localObjects) {
                     if (gameObject.equals(clientObject)) {
-                        clientObject.updateValues(gameObject.position, gameObject.scale, gameObject.rotation);
+                        clientObject.updateValues(gameObject.position, 
+                            gameObject.scale, 
+                            gameObject.rotation);
                         found = true;
                         break;
                     }
@@ -84,9 +87,12 @@ public class Engine {
         }
     }
 
+    /**
+     * Updates game state.
+     */
     public static void update() {
         if (tick.toMillis() >= 16) {
-            Engine.ClientNetworkUpdate();
+            Engine.clientNetworkUpdate();
             tick = Duration.ZERO;
         }
         

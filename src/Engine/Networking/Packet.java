@@ -11,12 +11,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
+/**
+ * A class to create byte packets.
+ */
 public class Packet {
 
     byte[] data;
     ArrayList<GameObject> gameOjbects = new ArrayList<GameObject>();
     UUID id;
 
+    /**
+     * Reads and creates a new packet.
+     * @param bytes packet bytes
+     */
     public Packet(byte[] bytes) {
         data = bytes;
         try {
@@ -26,6 +33,11 @@ public class Packet {
         }
     }
 
+    /**
+     * Creates a new packet to send.
+     * @param senderId client id
+     * @param gameObjects gameObjects
+     */
     public Packet(UUID senderId, HashMap<ClientData, ArrayList<GameObject>> gameObjects) {
         try {
             serializeData(senderId, gameObjects);
@@ -43,7 +55,14 @@ public class Packet {
         return data;
     }
 
-    private void serializeData(UUID id, HashMap<ClientData, ArrayList<GameObject>> gameObjects) throws IOException {
+    /**
+     * Serializes given gameObjects.
+     * @param id client id
+     * @param gameObjects gameObjects
+     * @throws IOException when there is a problem writing to output stream
+     */
+    private void serializeData(UUID id, HashMap<ClientData, ArrayList<GameObject>> gameObjects)
+            throws IOException {
         if (gameObjects == null) {
             return;
         }

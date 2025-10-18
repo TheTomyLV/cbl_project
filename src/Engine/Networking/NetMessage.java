@@ -1,22 +1,32 @@
 package Engine.Networking;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import Engine.Vector2;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import Engine.Vector2;
-
+/**
+ * A network message class to allow communication between server and client.
+ */
 public class NetMessage {
     public String type;
     public Object[] data;
 
+    /**
+     * Creates a new message.
+     * @param type message type
+     * @param data message arguments
+     */
     public NetMessage(String type, Object[] data) {
         this.type = type;
         this.data = data;
     }
 
+    /**
+     * Writes NetMessage to the given output stream.
+     * @param dos DataOutputStream
+     * @throws IOException when there is a problem writing to the output stream
+     */
     public void toOutputStream(DataOutputStream dos) throws IOException {
         dos.writeInt(Network.getIndexFromName(type));
 
@@ -42,6 +52,12 @@ public class NetMessage {
         }
     }
 
+    /**
+     * Reads the given input stream to get the NetMessage.
+     * @param dis DataInputStream
+     * @return NetMessage
+     * @throws IOException when there is a problem with reading the input stream
+     */
     public static NetMessage fromInputStream(DataInputStream dis) throws IOException {
         int index = dis.readInt();
         String type = Network.getTypeFromIndex(index);

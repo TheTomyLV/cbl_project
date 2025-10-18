@@ -1,17 +1,14 @@
 package Engine.Networking;
 
+import Engine.GameObject;
+import Engine.Scene;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
-
-import Engine.Engine;
-import Engine.GameObject;
-import Engine.Scene;
 
 /**
  * A server class to send and receive data.
@@ -52,6 +49,10 @@ public class Server extends Thread {
         start();
     }
 
+    /**
+     * An update method that updates all server objects.
+     * @param deltaTime engine delta time
+     */
     public void update(float deltaTime) {
         tick += deltaTime;
         if (tick >= 0.0016) {
@@ -66,6 +67,10 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * Adds a new server object.
+     * @param gameObject gameObject
+     */
     public static void addObject(GameObject gameObject) {
         if (Server.server == null) {
             return;
@@ -76,6 +81,10 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * Removes a server object.
+     * @param gameObject gameObject
+     */
     public static void removeObject(GameObject gameObject) {
         if (Server.server == null) {
             return;
@@ -99,7 +108,9 @@ public class Server extends Thread {
 
         for (Iterator<ClientData> it = clients.iterator(); it.hasNext();) {
             ClientData client = it.next();
-            DatagramPacket packet = new DatagramPacket(sendingBuf, sendingBuf.length, client.getAddress(), client.getPort());
+            DatagramPacket packet = new DatagramPacket(sendingBuf, 
+                sendingBuf.length, client.getAddress(), client.getPort());
+
             try {
                 socket.send(packet);
             } catch (Exception e) {
@@ -109,6 +120,11 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * Updates client gameObject states.
+     * @param newGameObjects new client gameObjects
+     * @param clientData client that the objects belong to
+     */
     private void updateGameObjects(ArrayList<GameObject> newGameObjects, ClientData clientData) {
         ArrayList<GameObject> clientGameObjects = allObjects.get(clientData);
         for (Iterator<GameObject> it = newGameObjects.iterator(); it.hasNext();) {
@@ -165,7 +181,9 @@ public class Server extends Thread {
             
             Packet dataPacket = new Packet(packet.getData());
 
-            ClientData currentClient = new ClientData(packet.getAddress(), packet.getPort(), dataPacket.id);
+            ClientData currentClient = new ClientData(packet.getAddress(), 
+                packet.getPort(), dataPacket.id);
+
             addNewClient(currentClient);
             
             if (clients.contains(currentClient)) {

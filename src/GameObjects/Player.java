@@ -23,8 +23,8 @@ public class Player extends GameObject {
     }
 
     @NetEvent("shoot")
-    public static void shoot(float rotation) {
-        Server.addObject(new Bullet(new Vector2(0f, 0f), rotation));
+    public static void shoot(float rotation, Vector2 position) {
+        Server.addObject(new Bullet(position, rotation));
     }
 
     @Override

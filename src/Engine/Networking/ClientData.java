@@ -3,13 +3,20 @@ package Engine.Networking;
 import java.net.InetAddress;
 import java.util.UUID;
 
-import Engine.GameObject;
-
+/**
+ * A class that holds connected client data.
+ */
 public class ClientData {
     private final InetAddress address;
     private final int port;
     private final UUID clientId;
 
+    /**
+     * Creates a new client data class.
+     * @param address client address
+     * @param port client prot
+     * @param clientId client UUID
+     */
     ClientData(InetAddress address, int port, UUID clientId) {
         this.clientId = clientId;
         this.address = address;
