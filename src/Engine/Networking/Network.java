@@ -78,7 +78,7 @@ public class Network {
                 registerHandler(messageType, paramTypes, (Object args) -> {
                     try {
                         // Invokes the method with args
-                        method.invoke(null, args);
+                        method.invoke(null, (Object[]) args);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

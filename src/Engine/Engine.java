@@ -2,6 +2,7 @@ package Engine;
 
 import Engine.Inputs.Input;
 import Engine.Networking.Client;
+import Engine.Networking.NetMessage;
 import Engine.Networking.Server;
 import java.time.Duration;
 import java.time.Instant;
@@ -49,6 +50,14 @@ public class Engine {
         return Engine.deltaTime.toNanos() / 1_000_000_000f;
     }
 
+    public static Client getClient() {
+        return client;
+    }
+
+    public static boolean isClientRunning() {
+        return client != null;
+    }
+
     /**
      * Updates client server received objects.
      */
@@ -83,6 +92,16 @@ public class Engine {
             for (int i = 0; i < localObjects.size(); i++) {
                 if (!serverObjects.contains(localObjects.get(i))) {
                     localObjects.remove(i);
+                }
+            }
+
+            // Removing ack messages
+            ArrayList<Integer> ackMessages = Engine.client.getAcknowledgedMessages();
+            ArrayList<NetMessage> messages = Engine.client.getMessages();
+            for (int i = 0; i < messages.size(); i++) {
+                if (ackMessages.contains(messages.get(i).getId())) {
+                    messages.remove(i);
+                    i--;
                 }
             }
         }

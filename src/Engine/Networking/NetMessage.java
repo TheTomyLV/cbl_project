@@ -11,6 +11,9 @@ import java.io.IOException;
 public class NetMessage {
     public String type;
     public Object[] data;
+    private boolean acknowledged = false;
+    private int id;
+    private static int nextId = 0;
 
     /**
      * Creates a new message.
@@ -20,6 +23,32 @@ public class NetMessage {
     public NetMessage(String type, Object[] data) {
         this.type = type;
         this.data = data;
+        this.id = nextId;
+        nextId++;
+    }
+
+    /**
+     * Crates NetMessage sent from others.
+     * @param type type of event
+     * @param data method arguments
+     * @param id message id
+     */
+    public NetMessage(String type, Object[] data, int id) {
+        this.type = type;
+        this.data = data;
+        this.id = id;
+    }
+
+    public boolean isAcknowledged() {
+        return acknowledged;
+    }
+
+    public void setAcknowledged(boolean acknowledged) {
+        this.acknowledged = acknowledged;
+    }
+
+    public int getId() {
+        return id;
     }
 
     /**
@@ -29,11 +58,12 @@ public class NetMessage {
      */
     public void toOutputStream(DataOutputStream dos) throws IOException {
         dos.writeInt(Network.getIndexFromName(type));
+        dos.writeInt(id);
 
         // Serialize data
         Class<?>[] paramTypes = Network.getParamTypes(type);
-        for (int i = 0; i < data.length; i++) {
-            Class<?> paramType = paramTypes[0];
+        for (int i = 0; i < paramTypes.length; i++) {
+            Class<?> paramType = paramTypes[i];
             if (paramType == int.class || paramType == Integer.class) {
                 dos.writeInt((Integer) data[i]);
             } else if (paramType == float.class || paramType == Float.class) {
@@ -60,13 +90,18 @@ public class NetMessage {
      */
     public static NetMessage fromInputStream(DataInputStream dis) throws IOException {
         int index = dis.readInt();
+        int id = dis.readInt();
+        
         String type = Network.getTypeFromIndex(index);
+        if (type == null) {
+            return null;
+        }
 
         Class<?>[] paramTypes = Network.getParamTypes(type);
         Object[] result = new Object[paramTypes.length];
         // Deserialize data
         for (int i = 0; i < paramTypes.length; i++) {
-            Class<?> paramType = paramTypes[0];
+            Class<?> paramType = paramTypes[i];
             if (paramType == int.class || paramType == Integer.class) {
                 result[i] = dis.readInt();
             } else if (paramType == float.class || paramType == Float.class) {
@@ -84,6 +119,6 @@ public class NetMessage {
                 result[i] = null;
             }
         }
-        return new NetMessage(type, result);
+        return new NetMessage(type, result, id);
     }
 }

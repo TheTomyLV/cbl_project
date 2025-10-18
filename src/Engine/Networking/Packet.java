@@ -17,7 +17,9 @@ import java.util.UUID;
 public class Packet {
 
     byte[] data;
-    ArrayList<GameObject> gameOjbects = new ArrayList<GameObject>();
+    ArrayList<GameObject> gameOjbects = new ArrayList<>();
+    ArrayList<NetMessage> netMessages = new ArrayList<>();
+    ArrayList<Integer> acknowledged = new ArrayList<>();
     UUID id;
 
     /**
@@ -38,9 +40,9 @@ public class Packet {
      * @param senderId client id
      * @param gameObjects gameObjects
      */
-    public Packet(UUID senderId, HashMap<ClientData, ArrayList<GameObject>> gameObjects) {
+    public Packet(UUID senderId, HashMap<ClientData, ArrayList<GameObject>> gameObjects, ArrayList<NetMessage> messages, ArrayList<Integer> acknowledged) {
         try {
-            serializeData(senderId, gameObjects);
+            serializeData(senderId, gameObjects, messages, acknowledged);
         } catch (Exception e) {
             data = new byte[0];
             e.printStackTrace();
@@ -49,6 +51,14 @@ public class Packet {
 
     public ArrayList<GameObject> getGameObjects() {
         return gameOjbects;
+    }
+
+    public ArrayList<NetMessage> getMessages() {
+        return netMessages;
+    }
+
+    public ArrayList<Integer> getAcknowledged() {
+        return acknowledged;
     }
 
     public byte[] getBytes() {
@@ -61,7 +71,7 @@ public class Packet {
      * @param gameObjects gameObjects
      * @throws IOException when there is a problem writing to output stream
      */
-    private void serializeData(UUID id, HashMap<ClientData, ArrayList<GameObject>> gameObjects)
+    private void serializeData(UUID id, HashMap<ClientData, ArrayList<GameObject>> gameObjects, ArrayList<NetMessage> messages, ArrayList<Integer> acknowledged)
             throws IOException {
         if (gameObjects == null) {
             return;
@@ -89,6 +99,21 @@ public class Packet {
             }
         }
 
+        dos.writeInt(messages.size());
+
+        // Serialize messages
+        for (int i = 0; i < messages.size(); i++) {
+            NetMessage message = messages.get(i);
+            message.toOutputStream(dos);
+        }
+
+        // Serialize acknowledgments
+        dos.writeInt(acknowledged.size());
+
+        for (int i = 0; i < acknowledged.size(); i++) {
+            dos.writeInt(acknowledged.get(i));
+        }
+
         dos.flush();
         data = baos.toByteArray();
     }
@@ -110,7 +135,28 @@ public class Packet {
             objects.add(obj);
         }
 
+        // Read messages
+        int messageCount = dis.readInt();
+        ArrayList<NetMessage> messages = new ArrayList<>();
+
+        for (int i = 0; i < messageCount; i++) {
+            NetMessage message = NetMessage.fromInputStream(dis);
+            if (message != null) {
+                messages.add(message);
+            }
+        }
+
+        // Read acknowledgments
+        int acknowledgedCount = dis.readInt();
+        ArrayList<Integer> acknowledged = new ArrayList<>();
+
+        for (int i = 0; i < acknowledgedCount; i++) {
+            acknowledged.add(dis.readInt());
+        }
+
+        this.acknowledged = acknowledged;
         gameOjbects = objects;
+        netMessages = messages;
     }
 
 }

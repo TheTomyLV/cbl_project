@@ -18,7 +18,9 @@ public class Client extends Thread {
     private boolean running;
     private final UUID clientId;
 
-    public ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
+    public ArrayList<GameObject> gameObjects = new ArrayList<>();
+    private ArrayList<NetMessage> messages = new ArrayList<>();
+    private ArrayList<Integer> ackMessages = new ArrayList<>();
 
     private byte[] sendingBuf;
     private byte[] receivingBuf = new byte[8192];
@@ -29,6 +31,14 @@ public class Client extends Thread {
 
     public UUID getClientId() {
         return clientId;
+    }
+
+    public ArrayList<Integer> getAcknowledgedMessages() {
+        return ackMessages;
+    }
+
+    public ArrayList<NetMessage> getMessages() {
+        return messages;
     }
 
     /**
@@ -55,7 +65,7 @@ public class Client extends Thread {
         }
         HashMap<ClientData, ArrayList<GameObject>> gameObjectMap = new HashMap<>();
         gameObjectMap.put(null, gameObjects);
-        Packet dataPacket = new Packet(clientId, gameObjectMap);
+        Packet dataPacket = new Packet(clientId, gameObjectMap, messages, new ArrayList<>());
         sendingBuf = dataPacket.getBytes();
         DatagramPacket packet = new DatagramPacket(sendingBuf, sendingBuf.length, address, port);
         
@@ -80,10 +90,15 @@ public class Client extends Thread {
             Packet dataPacket = new Packet(packet.getData());
 
             gameObjects = dataPacket.getGameObjects();
+            ackMessages = dataPacket.getAcknowledged();
             
         }
         socket.close();
 
+    }
+
+    public void addMessage(NetMessage msg) {
+        messages.add(msg);
     }
 
     /**

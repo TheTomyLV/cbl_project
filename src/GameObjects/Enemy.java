@@ -30,5 +30,6 @@ public class Enemy extends GameObject {
 
         position = position.add(velocity);
         velocity = velocity.multiply(0.99f); // Hacky for now
+        rotation += deltaTime * 200f;
     }
 }

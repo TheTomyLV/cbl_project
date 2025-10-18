@@ -21,6 +21,7 @@ public class Server extends Thread {
     private byte[] sendingBuf;
     private HashMap<ClientData, ArrayList<GameObject>> allObjects = new HashMap<>();
     private HashSet<ClientData> clients = new HashSet<>();
+    private HashMap<ClientData, ArrayList<Integer>> ackMessages = new HashMap<>();
     private final UUID serverId = new UUID(0, 0);
     private float tick = 0f;
     private Scene currentScene;
@@ -67,6 +68,36 @@ public class Server extends Thread {
         }
     }
 
+    private void executeMessages(ArrayList<NetMessage> messages, ClientData client) {
+        ArrayList<Integer> clientAck = ackMessages.get(client);
+        for (int i = 0; i < messages.size(); i++) {
+            NetMessage message = messages.get(i);
+            if (!clientAck.contains(message.getId())) {
+                Network.onMessageReceived(message);
+                clientAck.add(message.getId());
+            }
+        }
+        cleanupAck(clientAck, messages);
+    }
+
+    private void cleanupAck(ArrayList<Integer> clientAck, ArrayList<NetMessage> messages) {
+        for (int i = 0; i < clientAck.size(); i++) {
+            int ackId = clientAck.get(i);
+            boolean found = false;
+            for (int j = 0; j < messages.size(); j++) {
+                if (messages.get(i).getId() == ackId) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                clientAck.remove(i);
+                i--;
+            }
+        }
+    }
+
     /**
      * Adds a new server object.
      * @param gameObject gameObject
@@ -95,6 +126,10 @@ public class Server extends Thread {
         }
     }
 
+    public static ArrayList<GameObject> getObjects() {
+        return Server.server.allObjects.get(null);
+    }
+
     public static void changeScene(Scene scene) {
         Server.server.currentScene = scene;
     }
@@ -103,11 +138,14 @@ public class Server extends Thread {
         if (!running) {
             return;
         }
-        Packet dataPacket = new Packet(serverId, serverObjects);
-        sendingBuf = dataPacket.getBytes();
+        
+        
 
         for (Iterator<ClientData> it = clients.iterator(); it.hasNext();) {
             ClientData client = it.next();
+            Packet dataPacket = new Packet(serverId, serverObjects, new ArrayList<>(), ackMessages.get(client));
+            sendingBuf = dataPacket.getBytes();
+            
             DatagramPacket packet = new DatagramPacket(sendingBuf, 
                 sendingBuf.length, client.getAddress(), client.getPort());
 
@@ -168,6 +206,7 @@ public class Server extends Thread {
         if (!clients.contains(client)) {
             clients.add(client);
             allObjects.put(client, new ArrayList<>());
+            ackMessages.put(client, new ArrayList<>());
         }
     }
 
@@ -191,6 +230,7 @@ public class Server extends Thread {
             
             if (clients.contains(currentClient)) {
                 updateGameObjects(dataPacket.getGameObjects(), currentClient);
+                executeMessages(dataPacket.getMessages(), currentClient);
             }
         }
         socket.close();

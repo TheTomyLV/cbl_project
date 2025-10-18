@@ -204,8 +204,33 @@ public class GameObject implements Serializable {
         return new GameObject(id, position, scale, rotation, imageIndex);
     }
 
-    public void sendMessage(String type, Object... args) {
+    /**
+     * Sends a NetMessage with given type from the client to the server.
+     * @param type NetEvent type
+     * @param args method arguments
+     * @return Generated NetMessage
+     */
+    public NetMessage sendMessage(String type, Object... args) {
+        if (!Engine.isClientRunning()) {
+            System.err.println("Cannot send message: " + type + ". Client is not running.");
+            return null;
+        }
         NetMessage msg = new NetMessage(type, args);
+        Engine.getClient().addMessage(msg);
+        return msg;
+    }
+
+    /**
+     * Sends a NetMessage from the server to the client.
+     * @param type event type
+     * @param client client UUID
+     * @param args method arguments
+     * @return Generated NetMessage
+     */
+    public NetMessage sendMessage(String type, UUID client, Object... args) {
+        NetMessage msg = new NetMessage(type, args);
+
+        return msg;
     }
 }
 
