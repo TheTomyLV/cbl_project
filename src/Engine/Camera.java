@@ -1,5 +1,8 @@
 package Engine;
 
+/**
+ * A camera for scenes.
+ */
 public class Camera {
     public static Camera currentCamera;
 

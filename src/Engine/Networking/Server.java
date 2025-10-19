@@ -95,6 +95,11 @@ public class Server extends Thread {
         return Server.server.clientUUIDs;
     }
 
+    /**
+     * Get ClientData from the client UUID.
+     * @param id client UUID
+     * @return ClientData
+     */
     public static ClientData getClientFromUUID(UUID id) {
         for (Iterator<ClientData> it = Server.server.clients.iterator(); it.hasNext();) {
             ClientData client = it.next();
@@ -223,7 +228,8 @@ public class Server extends Thread {
         for (Iterator<ClientData> it = clients.iterator(); it.hasNext();) {
             ClientData client = it.next();
             ArrayList<NetMessage> clientMessages = messages.get(client.getUUID());
-            Packet dataPacket = new Packet(serverId, serverObjects, clientMessages, executedMessages.get(client));
+            Packet dataPacket = new Packet(serverId, serverObjects, 
+                                           clientMessages, executedMessages.get(client));
             sendingBuf = dataPacket.getBytes();
             
             DatagramPacket packet = new DatagramPacket(sendingBuf, 

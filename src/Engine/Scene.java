@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.*;
 
-import GameObjects.Enemy;
-
 /**
  * A scene class that can be extended to act as the main game panel.
  */
@@ -109,6 +107,10 @@ public abstract class Scene extends JPanel {
 
     public abstract void setupScene();
 
+    /**
+     * Add a gameObject to scene.
+     * @param gameObject object to add
+     */
     public void addObject(GameObject gameObject) {
         gameObject.setOwnerUUID(Engine.getClient().getClientId());
         toAddObject.add(gameObject);

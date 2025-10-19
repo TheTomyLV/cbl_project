@@ -35,6 +35,11 @@ public class Network {
         return indexMap.get(index);
     }
 
+    /**
+     * Returns event index from event name.
+     * @param name event name
+     * @return event index
+     */
     public static int getIndexFromName(String name) {
         if (!typeMap.containsKey(name)) {
             return -1;

@@ -40,7 +40,8 @@ public class Packet {
      * @param senderId client id
      * @param gameObjects gameObjects
      */
-    public Packet(UUID senderId, HashMap<ClientData, ArrayList<GameObject>> gameObjects, ArrayList<NetMessage> messages, ArrayList<Integer> acknowledged) {
+    public Packet(UUID senderId, HashMap<ClientData, ArrayList<GameObject>> gameObjects, 
+                  ArrayList<NetMessage> messages, ArrayList<Integer> acknowledged) {
         try {
             serializeData(senderId, gameObjects, messages, acknowledged);
         } catch (Exception e) {
@@ -71,7 +72,8 @@ public class Packet {
      * @param gameObjects gameObjects
      * @throws IOException when there is a problem writing to output stream
      */
-    private void serializeData(UUID id, HashMap<ClientData, ArrayList<GameObject>> gameObjects, ArrayList<NetMessage> messages, ArrayList<Integer> acknowledged)
+    private void serializeData(UUID id, HashMap<ClientData, ArrayList<GameObject>> gameObjects, 
+                               ArrayList<NetMessage> messages, ArrayList<Integer> acknowledged)
             throws IOException {
         if (gameObjects == null) {
             return;

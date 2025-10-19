@@ -33,6 +33,11 @@ public class Vector2 {
         return new Vector2(x / scalar, y / scalar);
     }
 
+    /**
+     * Rotates the vector by the given degrees from (0, 0).
+     * @param rotation rotation in degrees
+     * @return rotated vector2
+     */
     public Vector2 rotate(float rotation) {
         double rotationRad = (double) Math.toRadians(rotation);
         float xOffset = (float) (Math.cos(rotationRad) * x - Math.sin(rotationRad) * y);

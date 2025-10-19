@@ -2,7 +2,6 @@ package Engine;
 
 import Engine.Networking.NetMessage;
 import Engine.Networking.Network;
-
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -58,6 +57,10 @@ public class GameObject implements Serializable {
         return myClass == cls;
     }
 
+    /**
+     * Play animation.
+     * @param animation animation
+     */
     public void playAnimation(Animation animation) {
         currentAnimation = animation;
         playingAnimation = true;
@@ -69,6 +72,10 @@ public class GameObject implements Serializable {
         playingAnimation = false;
     }
 
+    /**
+     * An update call that manages animation playing.
+     * @param deltaTime Engine delta time
+     */
     public void animationUpdate(float deltaTime) {
         if (!playingAnimation) {
             return;
@@ -93,7 +100,8 @@ public class GameObject implements Serializable {
      * @param rotation rotation
      * @param imageIndex sprite index
      */
-    GameObject(UUID id, Vector2 position, Vector2 scale, float rotation, int imageIndex, Class<?> cls, UUID ownerId) {
+    GameObject(UUID id, Vector2 position, Vector2 scale, 
+               float rotation, int imageIndex, Class<?> cls, UUID ownerId) {
         if (imageIndex != -1) {
             setSprite(imageIndex);
         }
