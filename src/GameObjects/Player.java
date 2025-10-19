@@ -26,6 +26,7 @@ public class Player extends GameObject {
     int maxHealth = 100;
     int selectedWeapon = 0;
     float reloadTime = 0.3f;
+    float invTimer = 0f;
     String weaponAttackType = "shoot_pistol";
 
     public int getHealth() {
@@ -73,9 +74,14 @@ public class Player extends GameObject {
         }
         AudioPlayer.playAudio(Player.hurtSfx, false);
         player = (Player) players.get(0);
+        if (player.invTimer > 0) {
+            return;
+        }
         player.health -= damage;
-        if (player.getHealth() < 0) {
-            player.health = 0;
+        if (player.getHealth() <= 0) {
+            player.health = 100;
+            player.position = new Vector2(230, 230);
+            player.invTimer = 1f;
         }
     }
 
@@ -133,6 +139,9 @@ public class Player extends GameObject {
     @Override
     public void update(float deltaTime) {
         time += deltaTime;
+        if (invTimer > 0) {
+            invTimer -= deltaTime;
+        }
 
         if (Input.isKeyPressed(KeyEvent.VK_1)) {
             selectWeapon(0);

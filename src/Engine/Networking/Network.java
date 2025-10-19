@@ -2,7 +2,10 @@ package Engine.Networking;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -26,9 +29,24 @@ public class Network {
                                         Consumer<Object> handler) {
         handlers.put(type, (Consumer<Object>) handler);
         methodParamTypes.put(type, paramTypes);
-        int index = indexMap.size();
-        indexMap.put(index, type);
-        typeMap.put(type, index);
+    }
+
+
+    /**
+     * Finalize handle order in alphabetical order, for consistent order.
+     */
+    public static void finalizeHandlers() {
+        List<String> keys = new ArrayList<>(handlers.keySet());
+        Collections.sort(keys);
+        indexMap = new HashMap<>();
+        typeMap = new HashMap<>();
+        for (int i = 0; i < keys.size(); i++) {
+            String type = keys.get(i);
+            indexMap.put(i, type);
+            typeMap.put(type, i);
+        }
+
+        System.out.println("Net events: " + keys);
     }
 
     public static String getTypeFromIndex(int index) {
@@ -91,10 +109,6 @@ public class Network {
                         e.printStackTrace();
                     }
                 });
-
-                String message = "Registered handler: \""
-                    + messageType + "\" " + cls.getSimpleName() + "." + method.getName();
-                System.out.println(message);
             }
         }
     }

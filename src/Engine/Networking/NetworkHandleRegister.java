@@ -24,6 +24,7 @@ public class NetworkHandleRegister {
                     Network.registerHandlersFromClass(cls);
                 }
             }
+            Network.finalizeHandlers();
         } catch (Exception e) {
             e.printStackTrace();
         }

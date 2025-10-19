@@ -42,7 +42,7 @@ public class ClassManager {
 
             for (Class<?> cls : classes) {
                 if (!Modifier.isAbstract(cls.getModifiers())) {
-                    System.out.println(cls.getName());
+                    System.out.println("Registered class: " + cls.getName());
                     ClassManager.registerClass(cls);
                 }
             }
