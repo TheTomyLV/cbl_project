@@ -23,6 +23,8 @@ public class GameObject implements Serializable {
     public Vector2 position = new Vector2(0, 0);
     public Vector2 scale = new Vector2(1, 1);
     public float rotation = 0.0f;
+    private int layerIndex = 0;
+    private boolean hasSetIndex = false;
     public Sprite currentSprite;
     private BufferedImage currentImage;
     private Class<?> myClass;
@@ -39,6 +41,22 @@ public class GameObject implements Serializable {
 
     public UUID getOwnerUUID() {
         return ownerUUID;
+    }
+
+    /**
+     * Changes layer of gameObject.
+     * @param layer layer index
+     */
+    public void setLayer(int layer) {
+        if (hasSetIndex && layerIndex == layer) {
+            return;
+        }
+        layerIndex = layer;
+        Engine.getCurrentScene().addToLayerChange(this);
+    }
+
+    public int getLayer() {
+        return layerIndex;
     }
 
     // For smooth server object movement
@@ -101,7 +119,7 @@ public class GameObject implements Serializable {
      * @param imageIndex sprite index
      */
     GameObject(UUID id, Vector2 position, Vector2 scale, 
-               float rotation, int imageIndex, Class<?> cls, UUID ownerId) {
+               float rotation, int imageIndex, Class<?> cls, UUID ownerId, int layerIndex) {
         if (imageIndex != -1) {
             setSprite(imageIndex);
         }
@@ -112,6 +130,7 @@ public class GameObject implements Serializable {
         this.rotation = rotation;
         this.myClass = cls;
         this.ownerUUID = ownerId;
+        this.layerIndex = layerIndex;
         targetPos = position;
     }
 
@@ -235,6 +254,7 @@ public class GameObject implements Serializable {
         dos.writeFloat(scale.x);
         dos.writeFloat(scale.y);
         dos.writeFloat(rotation);
+        dos.writeInt(layerIndex);
         if (currentSprite == null) {
             dos.writeInt(-1);
         } else {
@@ -259,6 +279,7 @@ public class GameObject implements Serializable {
         float scaleX = dis.readFloat();
         float scaleY = dis.readFloat();
         float rotation = dis.readFloat();
+        int layerIndex = dis.readInt();
         int imageIndex = dis.readInt();
         UUID id = new UUID(most, least);
         UUID ownerId = new UUID(ownerMost, ownerLeast);
@@ -266,7 +287,7 @@ public class GameObject implements Serializable {
         Vector2 scale = new Vector2(scaleX, scaleY);
         Class<?> cls = ClassManager.getClassFromIndex(classIndex);
 
-        return new GameObject(id, position, scale, rotation, imageIndex, cls, ownerId);
+        return new GameObject(id, position, scale, rotation, imageIndex, cls, ownerId, layerIndex);
     }
 
     /**

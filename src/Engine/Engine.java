@@ -84,6 +84,7 @@ public class Engine {
                             gameObject.scale, 
                             gameObject.rotation,
                             gameObject.currentSprite != null ? gameObject.currentSprite.index : -1);
+                        clientObject.setLayer(gameObject.getLayer());
                         found = true;
                         break;
                     }
@@ -99,7 +100,7 @@ public class Engine {
 
             for (int i = 0; i < localObjects.size(); i++) {
                 if (!serverObjects.contains(localObjects.get(i))) {
-                    localObjects.remove(i);
+                    Engine.getCurrentScene().destroyServerObject(localObjects.get(i));
                 }
             }
 

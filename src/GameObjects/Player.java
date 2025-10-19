@@ -92,7 +92,7 @@ public class Player extends GameObject {
     @Override
     protected void setup() {
         setSprite("player_pistol");
-        //setRotation(45);
+        setLayer(1);
         scale = new Vector2(0.15f, 0.15f);
         selectWeapon(0);
         Animation pistolAnim = new Animation();

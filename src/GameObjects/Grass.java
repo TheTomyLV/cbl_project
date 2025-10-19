@@ -9,5 +9,6 @@ public class Grass extends GameObject {
     protected void setup() {
         setSprite("grass");
         scale = new Vector2(0.4f, 0.4f);
+        setLayer(-100);
     }
 }

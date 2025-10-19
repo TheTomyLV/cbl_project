@@ -15,6 +15,9 @@ public abstract class Scene extends JPanel {
     ArrayList<GameObject> toAddObject = new ArrayList<>();
     ArrayList<GameObject> toRemoveObject = new ArrayList<>();
 
+    ArrayList<GameObject> drawOrder = new ArrayList<>();
+    ArrayList<GameObject> layerChange = new ArrayList<>();
+
 
     /**
      * Set scene layout and call setupScene.
@@ -62,12 +65,8 @@ public abstract class Scene extends JPanel {
     }
 
     private void draw(Graphics g) {
-        for (int i = 0; i < gameObjects.size(); i++) {
-            gameObjects.get(i).draw((Graphics2D) g);
-        }
-
-        for (int i = 0; i < serverObjects.size(); i++) {
-            serverObjects.get(i).draw((Graphics2D) g);
+        for (int i = 0; i < drawOrder.size(); i++) {
+            drawOrder.get(i).draw((Graphics2D) g);
         }
     }
 
@@ -89,7 +88,9 @@ public abstract class Scene extends JPanel {
 
         for (GameObject gameObject : toAddObject) {
             if (!gameObjects.contains(gameObject)) {
+                gameObject.setLayer(gameObject.getLayer());
                 gameObjects.add(gameObject);
+                drawOrder.add(gameObject);
             }
         }
         toAddObject.clear();
@@ -98,14 +99,43 @@ public abstract class Scene extends JPanel {
             if (gameObjects.contains(gameObject)) {
                 gameObject.onDestroy();
                 gameObjects.remove(gameObject);
+                drawOrder.remove(gameObject);
             }
         }
         toRemoveObject.clear();
+
+        layerChange();
 
         repaint();
     }
 
     public abstract void setupScene();
+
+    public void addToLayerChange(GameObject gameObject) {
+        layerChange.add(gameObject);
+    }
+
+    private void layerChange() {
+        for (int i = 0; i < layerChange.size(); i++) {
+            GameObject gameObject = layerChange.get(i);
+            drawOrder.remove(gameObject);
+
+            boolean added = false;
+            for (int j = 0; j < drawOrder.size(); j++) {
+                GameObject other = drawOrder.get(j);
+                if (gameObject.getLayer() <= other.getLayer()) {
+                    drawOrder.add(j, gameObject);
+                    added = true;
+                    break;
+                }
+            }
+            if (!added) {
+                drawOrder.add(gameObject);
+            }
+        }
+
+        layerChange = new ArrayList<>();
+    }
 
     /**
      * Add a gameObject to scene.
@@ -124,7 +154,8 @@ public abstract class Scene extends JPanel {
         if (serverObjects.contains(gameObject)) {
             return;
         }
-
+        gameObject.setLayer(gameObject.getLayer());
+        drawOrder.add(gameObject);
         serverObjects.add(gameObject);
     }
 
@@ -142,6 +173,7 @@ public abstract class Scene extends JPanel {
      */
     protected void destroyServerObject(GameObject gameObject) {
         if (serverObjects.contains(gameObject)) {
+            drawOrder.remove(gameObject);
             gameObject.onDestroy();
             serverObjects.remove(gameObject);
         }
