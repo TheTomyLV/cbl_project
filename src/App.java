@@ -3,7 +3,7 @@ import Engine.Engine;
 import Engine.Sprite;
 import Engine.Vector2;
 import Engine.Networking.NetworkHandleRegister;
-import Scenes.LobbyScene;
+import Scenes.MainMenuScene;
 
 /**
  * Main app for the program.
@@ -13,6 +13,8 @@ public class App {
     public void run() {
         // Initializes engine
         Engine.start();
+        Engine.setWindowIcon("src\\Assets\\art\\player\\smith_pistol.png");
+        Engine.setWindowName("Co-op Cop");
 
         // Register netowork events
         NetworkHandleRegister.registerAllGameObjectHandlers("GameObjects");
@@ -54,7 +56,7 @@ public class App {
         Sprite.loadImage("health_pickup", artAssetPath + "health_pickup.png", new Vector2(0.5f, 0.5f));
         
         // Load starting scene
-        Engine.changeScene(new LobbyScene());
+        Engine.changeScene(new MainMenuScene());
 
         // Update loop
         while (Engine.isRunning()) {

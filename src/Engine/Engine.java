@@ -4,9 +4,17 @@ import Engine.Inputs.Input;
 import Engine.Networking.Client;
 import Engine.Networking.NetMessage;
 import Engine.Networking.Server;
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 /**
@@ -31,11 +39,29 @@ public class Engine {
         jFrame.setSize(500, 600);
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jFrame.setTitle("Game");
         jFrame.addKeyListener(input);
         
         new Camera();
         running = true;
+    }
+
+    /**
+     * Sets the window icon.
+     * @param path image to icon
+     */
+    public static void setWindowIcon(String path) {
+        try {
+            Image image = (Image) ImageIO.read(new File(path));
+            ImageIcon icon = new ImageIcon();
+            icon.setImage(image);
+            jFrame.setIconImage(icon.getImage());
+        } catch (IOException e) {
+            System.err.println("Couldn't set icon!");
+        }
+    }
+
+    public static void setWindowName(String name) {
+        jFrame.setTitle(name);
     }
 
     public static Scene getCurrentScene() {
