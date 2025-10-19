@@ -80,6 +80,7 @@ public abstract class Scene extends JPanel {
 
         for (Iterator<GameObject> it = gameObjects.iterator(); it.hasNext();) {
             GameObject gameObject = it.next();
+            gameObject.animationUpdate(deltaTime);
             gameObject.update(deltaTime);
         }
 

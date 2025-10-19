@@ -123,6 +123,7 @@ public class Server extends Thread {
 
         for (int i = 0; i < gameObjects.size(); i++) {
             GameObject gameObject = gameObjects.get(i);
+            gameObject.animationUpdate(deltaTime);
             gameObject.update(deltaTime);
         }
     }
@@ -180,6 +181,10 @@ public class Server extends Thread {
         if (Server.server == null) {
             return;
         }
+        if (gameObject == null) {
+            return;
+        }
+
         ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
         if (!gameObjects.contains(gameObject)) {
             gameObject.setOwnerUUID(Server.server.serverId);

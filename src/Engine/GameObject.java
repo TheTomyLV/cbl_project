@@ -29,6 +29,11 @@ public class GameObject implements Serializable {
     private Class<?> myClass;
     private UUID ownerUUID;
 
+    private boolean playingAnimation = false;
+    private float animTime = 0f;
+    private int frameIndex = 0;
+    private Animation currentAnimation;
+
     public void setOwnerUUID(UUID uuid) {
         ownerUUID = uuid;
     }
@@ -51,6 +56,33 @@ public class GameObject implements Serializable {
 
     public boolean isOfClass(Class<?> cls) {
         return myClass == cls;
+    }
+
+    public void playAnimation(Animation animation) {
+        currentAnimation = animation;
+        playingAnimation = true;
+        animTime = 0f;
+        frameIndex = 0;
+    }
+
+    public void stopAnimation() {
+        playingAnimation = false;
+    }
+
+    public void animationUpdate(float deltaTime) {
+        if (!playingAnimation) {
+            return;
+        }
+        animTime += deltaTime;
+        if (animTime >= currentAnimation.getFrameDelay(frameIndex)) {
+            setSprite(currentAnimation.getFrameName(frameIndex));
+            if (currentAnimation.hasNextFrame(frameIndex)) {
+                frameIndex++;
+                animTime = 0;
+            } else {
+                playingAnimation = false;
+            }
+        }
     }
 
     /**

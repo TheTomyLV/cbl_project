@@ -1,5 +1,6 @@
 package GameObjects;
 
+import Engine.Animation;
 import Engine.Camera;
 import Engine.Engine;
 import Engine.GameObject;
@@ -17,13 +18,8 @@ public class Player extends GameObject {
     float speed = 2.0f;
     Vector2 velocity = new Vector2(0f, 0f);
     AudioClip shooting = new AudioClip("src\\Assets\\audio\\shoot.wav");
-    String[] pistolAnim = {"player_pistol1", "player_pistol2", "player_pistol3", "player_pistol"};
-    String[] mgAnim = {"player_mg1", "player_mg2", "player_mg"};
-    String[] shotgunAnim = {"player_sg", "player_sg1", "player_sg2", "player_sg3", "player_sg", "player_sg4", "player_sg5", "player_sg6", "player_sg7", "player_sg4", "player_sg"};
-    String[] currentAnim = pistolAnim;
-    boolean playAnimation = false;
-    int animationIndex = 0;
-    float animTime = 0f;
+    ArrayList<Animation> animations;
+
     int health = 100;
     int maxHealth = 100;
     int selectedWeapon = 0;
@@ -39,25 +35,23 @@ public class Player extends GameObject {
     }
 
     private void selectWeapon(int index) {
-        animationIndex = 0;
+        selectedWeapon = index;
+        stopAnimation();
         switch (index) {
             case 0:
                 reloadTime = 0.3f;
                 weaponAttackType = "shoot_pistol";
                 setSprite("player_pistol");
-                currentAnim = pistolAnim;
                 break;
             case 1:
-                reloadTime = 0.8f;
+                reloadTime = 0.9f;
                 weaponAttackType = "shoot_shotgun";
                 setSprite("player_sg");
-                currentAnim = shotgunAnim;
                 break;
             case 2:
                 reloadTime = 0.1f;
                 weaponAttackType = "shoot_minigun";
                 setSprite("player_mg");
-                currentAnim = mgAnim;
             default:
                 break;
         }
@@ -101,25 +95,38 @@ public class Player extends GameObject {
         //setRotation(45);
         scale = new Vector2(0.15f, 0.15f);
         selectWeapon(0);
+        Animation pistolAnim = new Animation();
+        pistolAnim.addFrame("player_pistol1", 0.03f);
+        pistolAnim.addFrame("player_pistol2", 0.03f);
+        pistolAnim.addFrame("player_pistol3", 0.03f);
+        pistolAnim.addFrame("player_pistol", 0.03f);
+
+        Animation rifleAnim = new Animation();
+        rifleAnim.addFrame("player_mg1", 0.03f);
+        rifleAnim.addFrame("player_mg2", 0.03f);
+        rifleAnim.addFrame("player_mg", 0.03f);
+
+        Animation shotgunAnim = new Animation();
+        shotgunAnim.addFrame("player_sg1", 0.03f);
+        shotgunAnim.addFrame("player_sg2", 0.03f);
+        shotgunAnim.addFrame("player_sg3", 0.03f);
+        shotgunAnim.addFrame("player_sg", 0.03f);
+        shotgunAnim.addFrame("player_sg4", 0.45f);
+        shotgunAnim.addFrame("player_sg5", 0.04f);
+        shotgunAnim.addFrame("player_sg6", 0.04f);
+        shotgunAnim.addFrame("player_sg7", 0.04f);
+        shotgunAnim.addFrame("player_sg4", 0.04f);
+        shotgunAnim.addFrame("player_sg", 0.04f);
+
+        animations = new ArrayList<>();
+        animations.add(pistolAnim);
+        animations.add(shotgunAnim);
+        animations.add(rifleAnim);
     }
 
     @Override
     public void update(float deltaTime) {
         time += deltaTime;
-        animTime += deltaTime;
-
-        // Animation
-        if (playAnimation) {
-            if (animTime >= 0.03f) {
-                setSprite(currentAnim[animationIndex]);
-                animationIndex++;
-                animTime = 0;
-                if (animationIndex >= currentAnim.length) {
-                    animationIndex = 0;
-                    playAnimation = false;
-                }
-            }
-        }
 
         if (Input.isKeyPressed(KeyEvent.VK_1)) {
             selectWeapon(0);
@@ -156,7 +163,7 @@ public class Player extends GameObject {
             Vector2 bulletPosition = position;
             sendMessage(weaponAttackType, bulletPosition, rotation);
             time = 0;
-            playAnimation = true;
+            playAnimation(animations.get(selectedWeapon));
         }
 
         Camera.currentCamera.position = position;
