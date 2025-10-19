@@ -14,10 +14,12 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class Player extends GameObject {
-    double time = 0;
+    double time = 0f;
     float speed = 2.0f;
     Vector2 velocity = new Vector2(0f, 0f);
-    AudioClip shooting = new AudioClip("src\\Assets\\audio\\shoot.wav");
+    AudioClip shootSfx = new AudioClip("src\\Assets\\audio\\shoot.wav");
+    static AudioClip pickupSfx = new AudioClip("src\\Assets\\audio\\pickup.wav");
+    static AudioClip hurtSfx = new AudioClip("src\\Assets\\audio\\hurt.wav");
     ArrayList<Animation> animations;
 
     int health = 100;
@@ -52,6 +54,7 @@ public class Player extends GameObject {
                 reloadTime = 0.1f;
                 weaponAttackType = "shoot_minigun";
                 setSprite("player_mg");
+                break;
             default:
                 break;
         }
@@ -68,6 +71,7 @@ public class Player extends GameObject {
         if (players.size() == 0) {
             return;
         }
+        AudioPlayer.playAudio(Player.hurtSfx, false);
         player = (Player) players.get(0);
         player.health -= damage;
         if (player.getHealth() < 0) {
@@ -82,11 +86,13 @@ public class Player extends GameObject {
         if (players.size() == 0) {
             return;
         }
+        AudioPlayer.playAudio(Player.pickupSfx, false);
         player = (Player) players.get(0);
         player.health += health;
         if (player.getHealth() > player.maxHealth) {
             player.health = player.maxHealth;
         }
+
     }
 
     @Override
@@ -159,7 +165,7 @@ public class Player extends GameObject {
         // Shooting
         if (Input.mouse.isClicked(0) && time >= reloadTime) {
             
-            AudioPlayer.playAudio(shooting, false);
+            AudioPlayer.playAudio(shootSfx, false);
             Vector2 bulletPosition = position;
             sendMessage(weaponAttackType, bulletPosition, rotation);
             time = 0;

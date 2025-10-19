@@ -5,7 +5,10 @@ import Engine.Networking.Client;
 import Engine.Networking.NetMessage;
 import Engine.Networking.Server;
 
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +39,35 @@ public class Engine {
      */
     public static void start() {
         jFrame = new JFrame();
-        jFrame.setSize(500, 600);
+        jFrame.setSize(new Dimension(500, 600));
+        jFrame.setMinimumSize(new Dimension(400, 400));
+        jFrame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int minW = jFrame.getMinimumSize().width;
+                int minH = jFrame.getMinimumSize().height;
+
+                int w = jFrame.getWidth();
+                int h = jFrame.getHeight();
+
+                boolean changed = false;
+
+                if (w < minW) {
+                    w = minW;
+                    changed = true;
+                }
+                if (h < minH) {
+                    h = minH;
+                    changed = true;
+                }
+
+                if (changed) {
+                    jFrame.setSize(w, h);
+                }
+            }
+        });
+
+
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.addKeyListener(input);

@@ -6,6 +6,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 
 /**
@@ -37,7 +38,8 @@ public class AudioClip {
             audioData = decodedStream.readAllBytes();
             format = decodedFormat;
             clip = createClip(false);
-            clip.setFramePosition(clip.getFrameLength());
+            FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            volume.setValue(volume.getMinimum());
             clip.start();
         } catch (Exception e) {
             System.err.println("Failed to load audio clip : " + e.getMessage());
