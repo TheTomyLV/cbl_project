@@ -36,6 +36,9 @@ public class Network {
     }
 
     public static int getIndexFromName(String name) {
+        if (!typeMap.containsKey(name)) {
+            return -1;
+        }
         return typeMap.get(name);
     }
 

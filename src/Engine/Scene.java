@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.*;
 
+import GameObjects.Enemy;
+
 /**
  * A scene class that can be extended to act as the main game panel.
  */
@@ -25,10 +27,40 @@ public abstract class Scene extends JPanel {
     }
 
     @Override
-    protected synchronized void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         draw(g);
+    }
+
+    /**
+     * Gets a list of local gameObjects of class.
+     * @param cls class to get
+     * @return list of lical gameObjects
+     */
+    public ArrayList<GameObject> getObjectsOfClass(Class<?> cls) {
+        ArrayList<GameObject> returnedObjects = new ArrayList<>();
+        for (GameObject gameObject : gameObjects) {
+            if (gameObject.isOfClass(cls)) {
+                returnedObjects.add(gameObject);
+            }
+        }
+        return returnedObjects;
+    }
+
+    /**
+     * Return a list of server gameObjects of class.
+     * @param cls class of gameObject
+     * @return list of gameObjects
+     */
+    public ArrayList<GameObject> getServerObjectOfClass(Class<?> cls) {
+        ArrayList<GameObject> returnedObjects = new ArrayList<>();
+        for (GameObject gameObject : serverObjects) {
+            if (gameObject.isOfClass(cls)) {
+                returnedObjects.add(gameObject);
+            }
+        }
+        return returnedObjects;
     }
 
     private void draw(Graphics g) {
@@ -77,6 +109,7 @@ public abstract class Scene extends JPanel {
     public abstract void setupScene();
 
     public void addObject(GameObject gameObject) {
+        gameObject.setOwnerUUID(Engine.getClient().getClientId());
         toAddObject.add(gameObject);
     }
 
@@ -88,6 +121,7 @@ public abstract class Scene extends JPanel {
         if (serverObjects.contains(gameObject)) {
             return;
         }
+
         serverObjects.add(gameObject);
     }
 

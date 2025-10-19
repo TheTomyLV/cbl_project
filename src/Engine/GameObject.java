@@ -1,6 +1,8 @@
 package Engine;
 
 import Engine.Networking.NetMessage;
+import Engine.Networking.Network;
+
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -24,7 +26,16 @@ public class GameObject implements Serializable {
     public float rotation = 0.0f;
     public Sprite currentSprite;
     private BufferedImage currentImage;
+    private Class<?> myClass;
+    private UUID ownerUUID;
 
+    public void setOwnerUUID(UUID uuid) {
+        ownerUUID = uuid;
+    }
+
+    public UUID getOwnerUUID() {
+        return ownerUUID;
+    }
 
     // For smooth server object movement
     private Vector2 targetPos;
@@ -34,7 +45,12 @@ public class GameObject implements Serializable {
      */
     public GameObject() {
         this.id = UUID.randomUUID();
+        this.myClass = getClass();
         setup();
+    }
+
+    public boolean isOfClass(Class<?> cls) {
+        return myClass == cls;
     }
 
     /**
@@ -45,7 +61,7 @@ public class GameObject implements Serializable {
      * @param rotation rotation
      * @param imageIndex sprite index
      */
-    GameObject(UUID id, Vector2 position, Vector2 scale, float rotation, int imageIndex) {
+    GameObject(UUID id, Vector2 position, Vector2 scale, float rotation, int imageIndex, Class<?> cls, UUID ownerId) {
         if (imageIndex != -1) {
             setSprite(imageIndex);
         }
@@ -54,6 +70,8 @@ public class GameObject implements Serializable {
         this.scale = scale;
         this.scale = scale;
         this.rotation = rotation;
+        this.myClass = cls;
+        this.ownerUUID = ownerId;
         targetPos = position;
     }
 
@@ -120,11 +138,7 @@ public class GameObject implements Serializable {
         return;
     }
 
-    protected void onLoad() {
-        return;
-    }
-
-    protected void onDestroy() {
+    public void onDestroy() {
         return;
     }
 
@@ -170,8 +184,12 @@ public class GameObject implements Serializable {
      * @throws IOException when there is a problem with writing to output stream
      */
     public void toOutputStream(DataOutputStream dos) throws IOException {
+        int classIndex = ClassManager.getIndexFromClass(myClass);
+        dos.writeInt(classIndex);
         dos.writeLong(id.getMostSignificantBits());
         dos.writeLong(id.getLeastSignificantBits());
+        dos.writeLong(ownerUUID.getMostSignificantBits());
+        dos.writeLong(ownerUUID.getLeastSignificantBits());
         dos.writeFloat(position.x);
         dos.writeFloat(position.y);
         dos.writeFloat(scale.x);
@@ -191,8 +209,11 @@ public class GameObject implements Serializable {
      * @throws IOException when there is a problem with reading input stream
      */
     public static GameObject fromInputStream(DataInputStream dis) throws IOException {
+        int classIndex = dis.readInt();
         long most = dis.readLong();
         long least = dis.readLong();
+        long ownerMost = dis.readLong();
+        long ownerLeast = dis.readLong();
         float x = dis.readFloat();
         float y = dis.readFloat();
         float scaleX = dis.readFloat();
@@ -200,9 +221,12 @@ public class GameObject implements Serializable {
         float rotation = dis.readFloat();
         int imageIndex = dis.readInt();
         UUID id = new UUID(most, least);
+        UUID ownerId = new UUID(ownerMost, ownerLeast);
         Vector2 position = new Vector2(x, y);
         Vector2 scale = new Vector2(scaleX, scaleY);
-        return new GameObject(id, position, scale, rotation, imageIndex);
+        Class<?> cls = ClassManager.getClassFromIndex(classIndex);
+
+        return new GameObject(id, position, scale, rotation, imageIndex, cls, ownerId);
     }
 
     /**
@@ -216,6 +240,11 @@ public class GameObject implements Serializable {
             System.err.println("Cannot send message: " + type + ". Client is not running.");
             return null;
         }
+        if (Network.getIndexFromName(type) == -1) {
+            System.err.println("Event of type " + type + " not found!");
+            return null;
+        }
+
         NetMessage msg = new NetMessage(type, args);
         Engine.getClient().addMessage(msg);
         return msg;
@@ -230,6 +259,11 @@ public class GameObject implements Serializable {
      */
     public NetMessage sendMessage(String type, UUID client, Object... args) {
         if (!Engine.isServerRunning()) {
+            return null;
+        }
+        
+        if (Network.getIndexFromName(type) == -1) {
+            System.err.println("Event of type " + type + " not found!");
             return null;
         }
         NetMessage msg = new NetMessage(type, args);

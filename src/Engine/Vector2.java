@@ -33,6 +33,13 @@ public class Vector2 {
         return new Vector2(x / scalar, y / scalar);
     }
 
+    public Vector2 rotate(float rotation) {
+        double rotationRad = (double) Math.toRadians(rotation);
+        float xOffset = (float) (Math.cos(rotationRad) * x - Math.sin(rotationRad) * y);
+        float yOffset = (float) (Math.sin(rotationRad) * x + Math.cos(rotationRad) * y);
+        return new Vector2(xOffset, yOffset);
+    }
+
     public float dot(Vector2 other) {
         return x * other.x + y * other.y;
     }
@@ -42,7 +49,7 @@ public class Vector2 {
     }
 
     public float getRotation() {
-        return (float) Math.atan2(y, x);
+        return (float) Math.toDegrees(Math.atan2(y, x));
     }
 
     /**

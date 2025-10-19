@@ -42,6 +42,43 @@ public class Server extends Thread {
     }
 
     /**
+     * Get a list of server objects of class.
+     * @param cls class of gameObject
+     * @return list of gameObjects
+     */
+    public static ArrayList<GameObject> getServerObjectOfClass(Class<?> cls) {
+        ArrayList<GameObject> returnedObjects = new ArrayList<>();
+        ArrayList<GameObject> serverObjects = Server.server.allObjects.get(null);
+        for (int i = 0; i < serverObjects.size(); i++) {
+            if (serverObjects.get(i).isOfClass(cls)) {
+                returnedObjects.add(serverObjects.get(i));
+            }
+        }
+        return returnedObjects;
+    }
+
+    /**
+     * Gets all client GameObjects of class.
+     * @param cls class of gameObject
+     * @return list of gameObjects
+     */
+    public static ArrayList<GameObject> getClientObjectOfClass(Class<?> cls) {
+        ArrayList<GameObject> returnedObjects = new ArrayList<>();
+        ArrayList<UUID> clients = getClientUUIDs();
+
+        for (int i = 0; i < clients.size(); i++) {
+            ClientData client = getClientFromUUID(clients.get(i));
+            ArrayList<GameObject> serverObjects = getClientObjects(client);
+            for (int j = 0; j < serverObjects.size(); j++) {
+                if (serverObjects.get(j).isOfClass(cls)) {
+                    returnedObjects.add(serverObjects.get(j));
+                }
+            }
+        }
+        return returnedObjects;
+    }
+
+    /**
      * Set a port and start server.
      * @param port port
      * @throws Exception throws an exception if server cannot be opened
@@ -56,6 +93,20 @@ public class Server extends Thread {
 
     public static ArrayList<UUID> getClientUUIDs() {
         return Server.server.clientUUIDs;
+    }
+
+    public static ClientData getClientFromUUID(UUID id) {
+        for (Iterator<ClientData> it = Server.server.clients.iterator(); it.hasNext();) {
+            ClientData client = it.next();
+            if (client.getUUID() == id) {
+                return client;
+            }
+        }
+        return null;
+    }
+
+    public static ArrayList<GameObject> getClientObjects(ClientData client) {
+        return Server.server.allObjects.get(client);
     }
 
     /**
@@ -131,6 +182,7 @@ public class Server extends Thread {
         }
         ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
         if (!gameObjects.contains(gameObject)) {
+            gameObject.setOwnerUUID(Server.server.serverId);
             gameObjects.add(gameObject);
         }
     }
@@ -145,6 +197,7 @@ public class Server extends Thread {
         }
         ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
         if (gameObjects.contains(gameObject)) {
+            gameObject.onDestroy();
             gameObjects.remove(gameObject);
         }
     }

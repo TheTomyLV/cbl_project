@@ -1,5 +1,6 @@
 package Engine.Networking;
 
+import Engine.ClassManager;
 import Engine.GameObject;
 import java.io.File;
 import java.lang.reflect.Modifier;
@@ -17,7 +18,7 @@ public class NetworkHandleRegister {
      */
     public static void registerAllGameObjectHandlers(String basePackage) {
         try {
-            List<Class<?>> classes = getClassesRecursive(basePackage);
+            List<Class<?>> classes = ClassManager.getClassesRecursive(basePackage);
 
             for (Class<?> cls : classes) {
                 if (GameObject.class.isAssignableFrom(cls) 
@@ -28,37 +29,5 @@ public class NetworkHandleRegister {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private static List<Class<?>> getClassesRecursive(String packageName) throws Exception {
-        List<Class<?>> classes = new ArrayList<>();
-        String path = packageName.replace('.', '/');
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        URL resource = classLoader.getResource(path);
-
-        if (resource == null) {
-            return Collections.emptyList();
-        }
-
-        File directory = new File(resource.getFile());
-        if (!directory.exists()) {
-            return Collections.emptyList();
-        }
-
-        for (File file : Objects.requireNonNull(directory.listFiles())) {
-            if (file.isDirectory()) {
-                // Recurse into subpackages
-                classes.addAll(getClassesRecursive(packageName + "." + file.getName()));
-            } else if (file.getName().endsWith(".class")) {
-                String className = packageName + '.' + file.getName().replace(".class", "");
-                try {
-                    classes.add(Class.forName(className));
-                } catch (Throwable ignored) {
-                    ignored.getMessage();
-                }
-            }
-        }
-
-        return classes;
     }
 }

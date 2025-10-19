@@ -20,7 +20,7 @@ public class EnemyManager extends GameObject {
     public void update(float deltaTime) {
         time += deltaTime;
 
-        if (time >= 1) {
+        if (time >= 4) {
             Enemy enemy = new Enemy(new Vector2(rng.nextFloat(0, 460), rng.nextFloat(0, 460)));
             Server.addObject(enemy);
             time = 0;

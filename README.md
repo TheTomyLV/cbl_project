@@ -12,6 +12,8 @@ Explore how enemy agents work
 Explore how enemy pathfinding works
 ### Game engine
 Learn how a game engine functions
+### Annotations
+Learn how annotations work and use them in the networking engine
 
 ## Todo - in priority
 - [ ] Classed that need to be refactored
@@ -43,21 +45,22 @@ Learn how a game engine functions
     - [X] Camera
     - [ ] Collisions
     - [X] Input
-    - [ ] Sounds
+    - [X] Sounds
     - [ ] Better camera
     - [X] Sprite assets are loaded in at start
 
 - [ ] Networking
+    - [ ] Client checks if it can connect to server
     - [X] Both players are rendered on screen
     - [X] Both players input work and they can see each other move around
-    - [ ] Players can shoot bullets and both players see the bullets
+    - [X] Players can shoot bullets and both players see the bullets
     - [ ] Handle player disconnects
-    - [ ] Server owned entities
+    - [X] Server owned entities
 
 - [ ] Enemies(Enemies is an abstract class that can be extended, for example add stronger units, ranged units etc.)
-    - [ ] Enemies randomly spawn around for all clients
-    - [ ] Enemies can take damage
-    - [ ] Enemies can die
+    - [X] Enemies randomly spawn around for all clients
+    - [X] Enemies can take damage
+    - [X] Enemies can die
     - [ ] Enemies move towards players
     - [ ] Enemies can attack player
 
