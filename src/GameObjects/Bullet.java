@@ -1,6 +1,7 @@
 package GameObjects;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import Engine.Engine;
 import Engine.GameObject;
@@ -10,10 +11,12 @@ import Engine.Networking.Server;
 public class Bullet extends GameObject {
     float time = 0f;
     float speed = 400f;
+    Vector2 velocity = new Vector2(0f, 0f);
 
     public Bullet(Vector2 position, float rotation) {
+        Random rng = new Random();
         this.position = position;
-        this.rotation = rotation;
+        this.rotation = rotation + rng.nextFloat(-10.0f, 10.0f);
     }
 
     @Override
@@ -34,7 +37,9 @@ public class Bullet extends GameObject {
             if (gameObjects.get(i) instanceof Enemy) {
                 float distance = gameObjects.get(i).position.subtract(position).length();
                 if (distance <= 9f) {
-                    Server.removeObject(gameObjects.get(i));
+                    sendMessage("hit", Server.getClientUUIDs().get(0), 5);
+                    Enemy enemy = (Enemy) gameObjects.get(i);
+                    enemy.hit(10);
                     Server.removeObject(this);
                 }
             }

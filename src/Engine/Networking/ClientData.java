@@ -31,6 +31,10 @@ public class ClientData {
         return port;
     }
 
+    public UUID getUUID() {
+        return clientId;
+    }
+
     @Override
     public int hashCode() {
         return clientId.hashCode();

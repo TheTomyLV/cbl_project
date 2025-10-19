@@ -29,8 +29,12 @@ public class Player extends GameObject {
 
     @NetEvent("shoot")
     public static void shoot(Vector2 position, float rotation) {
-        System.out.println("Shot");
         Server.addObject(new Bullet(position, rotation));
+    }
+
+    @NetEvent("hit")
+    public static void hit(int damage) {
+        System.out.println("Took " + damage + " damage!");
     }
 
     @Override
@@ -78,13 +82,13 @@ public class Player extends GameObject {
         rotation = (float) Math.toDegrees(rotation);
 
         // Shooting
-        if (Input.mouse.isClicked(0) && time >= 0.3) {
+        if (Input.mouse.isClicked(0) && time >= 0.1) {
             
             AudioPlayer.playAudio(shooting, false);
             Vector2 bulletPosition = position;
             double rotationRad = (double) Math.toRadians(rotation);
-            float xOffset = (float) (Math.cos(rotationRad) * 35f - Math.sin(rotationRad) * 7f);
-            float yOffset = (float) (Math.sin(rotationRad) * 35f + Math.cos(rotationRad) * 7f);
+            float xOffset = (float) (Math.cos(rotationRad) * 50f - Math.sin(rotationRad) * 7f);
+            float yOffset = (float) (Math.sin(rotationRad) * 50f + Math.cos(rotationRad) * 7f);
             Vector2 offset = new Vector2(xOffset, yOffset);
             bulletPosition = bulletPosition.add(offset);
             sendMessage("shoot", bulletPosition, rotation);

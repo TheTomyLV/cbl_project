@@ -21,6 +21,8 @@ public class Client extends Thread {
     public ArrayList<GameObject> gameObjects = new ArrayList<>();
     private ArrayList<NetMessage> messages = new ArrayList<>();
     private ArrayList<Integer> ackMessages = new ArrayList<>();
+    private ArrayList<NetMessage> receivedMessages = new ArrayList<>();
+    private ArrayList<Integer> executedMessages = new ArrayList<>();
 
     private byte[] sendingBuf;
     private byte[] receivingBuf = new byte[8192];
@@ -65,7 +67,7 @@ public class Client extends Thread {
         }
         HashMap<ClientData, ArrayList<GameObject>> gameObjectMap = new HashMap<>();
         gameObjectMap.put(null, gameObjects);
-        Packet dataPacket = new Packet(clientId, gameObjectMap, messages, new ArrayList<>());
+        Packet dataPacket = new Packet(clientId, gameObjectMap, messages, executedMessages);
         sendingBuf = dataPacket.getBytes();
         DatagramPacket packet = new DatagramPacket(sendingBuf, sendingBuf.length, address, port);
         
@@ -74,6 +76,36 @@ public class Client extends Thread {
         } catch (Exception e) {
             System.out.println("Failed to send package");
             return;
+        }
+    }
+
+
+    private void executeMessages(ArrayList<NetMessage> messages) {
+        for (int i = 0; i < messages.size(); i++) {
+            NetMessage message = messages.get(i);
+            if (!executedMessages.contains(message.getId())) {
+                Network.onMessageReceived(message);
+                executedMessages.add(message.getId());
+            }
+        }
+        cleanupAck(messages);
+    }
+
+    private void cleanupAck(ArrayList<NetMessage> messages) {
+        for (int i = 0; i < executedMessages.size(); i++) {
+            int ackId = executedMessages.get(i);
+            boolean found = false;
+            for (int j = 0; j < messages.size(); j++) {
+                if (messages.get(i).getId() == ackId) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                executedMessages.remove(i);
+                i--;
+            }
         }
     }
 
@@ -90,7 +122,10 @@ public class Client extends Thread {
             Packet dataPacket = new Packet(packet.getData());
 
             gameObjects = dataPacket.getGameObjects();
+            receivedMessages = dataPacket.getMessages();
             ackMessages = dataPacket.getAcknowledged();
+
+            executeMessages(receivedMessages);
             
         }
         socket.close();

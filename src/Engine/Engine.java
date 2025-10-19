@@ -54,8 +54,16 @@ public class Engine {
         return client;
     }
 
+    public static Server getServer() {
+        return server;
+    }
+
     public static boolean isClientRunning() {
         return client != null;
+    }
+
+    public static boolean isServerRunning() {
+        return server != null;
     }
 
     /**
@@ -100,6 +108,7 @@ public class Engine {
             ArrayList<NetMessage> messages = Engine.client.getMessages();
             for (int i = 0; i < messages.size(); i++) {
                 if (ackMessages.contains(messages.get(i).getId())) {
+                    messages.get(i).setAcknowledged(true);
                     messages.remove(i);
                     i--;
                 }

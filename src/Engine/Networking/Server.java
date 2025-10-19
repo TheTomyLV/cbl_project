@@ -19,9 +19,13 @@ public class Server extends Thread {
     private boolean running;
     private byte[] buf = new byte[8192];
     private byte[] sendingBuf;
-    private HashMap<ClientData, ArrayList<GameObject>> allObjects = new HashMap<>();
+
     private HashSet<ClientData> clients = new HashSet<>();
-    private HashMap<ClientData, ArrayList<Integer>> ackMessages = new HashMap<>();
+    private ArrayList<UUID> clientUUIDs = new ArrayList<>();
+    private HashMap<ClientData, ArrayList<GameObject>> allObjects = new HashMap<>();
+    private HashMap<ClientData, ArrayList<Integer>> executedMessages = new HashMap<>();
+    private HashMap<UUID, ArrayList<NetMessage>> messages = new HashMap<>();
+
     private final UUID serverId = new UUID(0, 0);
     private float tick = 0f;
     private Scene currentScene;
@@ -50,6 +54,10 @@ public class Server extends Thread {
         start();
     }
 
+    public static ArrayList<UUID> getClientUUIDs() {
+        return Server.server.clientUUIDs;
+    }
+
     /**
      * An update method that updates all server objects.
      * @param deltaTime engine delta time
@@ -68,8 +76,19 @@ public class Server extends Thread {
         }
     }
 
+    private void removeAckMessages(ArrayList<Integer> ackMessages, ClientData client) {
+        ArrayList<NetMessage> messages = this.messages.get(client.getUUID());
+        for (int i = 0; i < messages.size(); i++) {
+            if (ackMessages.contains(messages.get(i).getId())) {
+                messages.get(i).setAcknowledged(true);
+                messages.remove(i);
+                i--;
+            }
+        }
+    }
+
     private void executeMessages(ArrayList<NetMessage> messages, ClientData client) {
-        ArrayList<Integer> clientAck = ackMessages.get(client);
+        ArrayList<Integer> clientAck = executedMessages.get(client);
         for (int i = 0; i < messages.size(); i++) {
             NetMessage message = messages.get(i);
             if (!clientAck.contains(message.getId())) {
@@ -96,6 +115,10 @@ public class Server extends Thread {
                 i--;
             }
         }
+    }
+
+    public void addMessage(NetMessage msg, UUID clientId) {
+        messages.get(clientId).add(msg);
     }
 
     /**
@@ -139,11 +162,10 @@ public class Server extends Thread {
             return;
         }
         
-        
-
         for (Iterator<ClientData> it = clients.iterator(); it.hasNext();) {
             ClientData client = it.next();
-            Packet dataPacket = new Packet(serverId, serverObjects, new ArrayList<>(), ackMessages.get(client));
+            ArrayList<NetMessage> clientMessages = messages.get(client.getUUID());
+            Packet dataPacket = new Packet(serverId, serverObjects, clientMessages, executedMessages.get(client));
             sendingBuf = dataPacket.getBytes();
             
             DatagramPacket packet = new DatagramPacket(sendingBuf, 
@@ -206,7 +228,9 @@ public class Server extends Thread {
         if (!clients.contains(client)) {
             clients.add(client);
             allObjects.put(client, new ArrayList<>());
-            ackMessages.put(client, new ArrayList<>());
+            executedMessages.put(client, new ArrayList<>());
+            messages.put(client.getUUID(), new ArrayList<>());
+            clientUUIDs.add(client.getUUID());
         }
     }
 
@@ -231,6 +255,7 @@ public class Server extends Thread {
             if (clients.contains(currentClient)) {
                 updateGameObjects(dataPacket.getGameObjects(), currentClient);
                 executeMessages(dataPacket.getMessages(), currentClient);
+                removeAckMessages(dataPacket.getAcknowledged(), currentClient);
             }
         }
         socket.close();

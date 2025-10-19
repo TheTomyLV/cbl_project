@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 
+
 /**
  * Abstract GameObject that exsists in scenes.
  */
@@ -228,7 +229,11 @@ public class GameObject implements Serializable {
      * @return Generated NetMessage
      */
     public NetMessage sendMessage(String type, UUID client, Object... args) {
+        if (!Engine.isServerRunning()) {
+            return null;
+        }
         NetMessage msg = new NetMessage(type, args);
+        Engine.getServer().addMessage(msg, client);
 
         return msg;
     }
