@@ -2,20 +2,50 @@
 A multiplayer game where players cooperate to kill enemies that come towards them.
 
 ## Advanced topic choices
-### Networking (current choice)
-Create 2 players that can join the same grid world and can see each other
-### Build tools (current choice)
-Learn more about build tools, different types, how they work and other things.
-### Enemy agents
-Explore how enemy agents work
-### Enemy pathfinding
-Explore how enemy pathfinding works
-### Game engine
-Learn how a game engine functions
+### Networking
+## Network communication type
+There are two types of communication in networking tcp and udp, we already knew the basics of they work.
+We decided to go with udp, as that is most used in real time games, which this is.
+Udp is a connection, where packets sent can be lost and not delivered, as that is not checked when sending out a packet, unlike tcp where it waits when sending a packet to make sure it's delivered, which causes delays. Udp does not have this problem as it just sends the packet and forgets about it. 
+We used this tutorial [A Guide to UDP In Java](https://www.baeldung.com/udp-in-java) to set up a basic server client communication. 
+
+## Connection setup
+After that a basic engine was setup to render objects on screen.
+
+Now we needed to figure out how to send these created objects over to other clients. We chose client authorative approach, which means that the server trusts the clients, that all the object logic is correct. This was chosen as server only authority would mean that player inputs would have delays until the server sends a confimation of their actions. 
+
+We setup that the player that creates a server also connects to that server as a client, all other clients connect to this server. 
+
+## GameObject sending over the network
+A snapshot of the state of gameObjects should only be sent once and no acknowledgment is needed for that, as if a package is not received, it will get replaced by a more recent one.
+
+# Writing GameObjects to byte array
+For sending objects over the network we needed to find a way to convert these objects into a byte array, as that is the only accepted format to be sent over the network. We used DataOutputStream to write all the basic data types to a byte array [DataOutputStream in java](https://www.geeksforgeeks.org/java/dataoutputstream-in-java/) and added functions in GameObjects to write all the necessary data for correct display, this also required an implementation of unique identification of gameObjects, so that the server and client knows if that object is new or already added, we used UUID which generate a unique identification number for each gameObject, this was also used for Clients to identify them.
+
+
+# Reading GameObjects from byte array
+Now we needed to find a way to read this byte array and reconstruct the received gameObjects, for that we used DataInputStream which does the same thing as DataOutputStream, but now it reads basic data types from the byte array. This implementation now allowed for players to be displayed on all client screens, for testing purposes we also made players shoot bullets, but these were just client instances, which in no way could interact with other clients. 
+
+After that we added server objects, which would be enemies for example, as no player should own enemies. Also any object received from the network is just a basic GameObject, and there was no way to reconstruct what class it actually comes from. To fix this, so that the server or the client knows what object it has received loaded all classes that extend GameObject and assigned integer values to them, so that they can be sent over the netowork [Finding All Classes in a Java Package](https://www.baeldung.com/java-find-all-classes-in-package).
+
+## Network events
+After that was the hardest thing to implement, interaction between network entities. As a player bullet changing enemy health would have no effect, and even if it did, if multiple players changed the same enemy health at the same time, which health values would be the correct one? None of them, as the damage taken should be all added up.
+
+For this we implemented network events, which at high level are just function calls for the other side of the network, for example a player shoots a bullet and calls an event shoot, the server receives it and creates a server instance of a bullet. But the problem is that if an event is sent once over a udp packet, it could be lost and never executed. For this we needed an implementation that makes sure an event is executed once and only once. 
+
+In basic we setup an event array that is sent over the network, when the other party receives it, it executes it and marks it as executed and starts sending back that the event has been executed. When the party that sent the request received the acknowledgment, it stops sending that request. But now there is a problem of what function to execute when an event is received, writing function in an if else or switch statement would make the code hard to maintain and use if there are alot of events. For this we used annotations which are a really powerful tool to automate this process, but more of that in the annotations section.
+
+## Finishing the game
+With gameObject sending over the network and network events done, we could now finish the game, as all the required tools were now in place. Some notable uses of network events include shooting, which has 3 network event types ("shoot_pistol", "shoot_shotgun", "shoot_minigun") and these events just fire when a player presses left-click and also includes player position and rotation data to know where to spawn the bullets and when the server receives any of the events it creates a bullet pattern appropirate for the gun. There is also "player_hit" event which is sent from the server by the enemy and includes the damage the player should take and when the client receives it, it just subtracts that from it's health.
+
 ### Annotations
 Learn how annotations work and use them in the networking engine
 
 ## Todo - in priority
+- [ ] Write about advanced topics
+    - [ ] Networking
+    - [ ] Annotations
+
 - [ ] Classed that need to be refactored
     - [X] Mouse.java - needs to have the correct position, as right now it's attached to the frame, but needs to be attached to the panel
     - [ ] Client.java
@@ -26,47 +56,39 @@ Learn how annotations work and use them in the networking engine
     - [X] Scene.java - needs to only paint gameObjects on update call
     - [X] Sprite.java - Needs to be able to get the image index for serialization
 
-- [ ] Setup
+- [X] Setup
     - [x] Setup window
-    - [x] Add join/create lobby button
-    - [ ] Add lobby screen
-    - [x] Make create lobby work
-    - [x] Make join lobby work
-    - [ ] Display players on lobby screen
+    - [x] Add join/create game button
+    - [x] Make create game work
+    - [x] Make join game work
     - [x] Make the start game work
 
-- [ ] UI
-    - [ ] UI is scaled properly
+- [X] UI
+    - [X] UI is scaled properly
 
-- [ ] Game engine basics
+- [X] Game engine basics
     - [X] Object rendering
     - [X] Object translation
     - [X] Object rotation
     - [X] Camera
-    - [ ] Collisions
+    - [X] Collisions
     - [X] Input
     - [X] Sounds
-    - [ ] Better camera
     - [X] Sprite assets are loaded in at start
 
-- [ ] Networking
-    - [ ] Client checks if it can connect to server
+- [X] Networking
+    - [X] Client checks if it can connect to server
     - [X] Both players are rendered on screen
     - [X] Both players input work and they can see each other move around
     - [X] Players can shoot bullets and both players see the bullets
-    - [ ] Handle player disconnects
+    - [X] Handle player disconnects
     - [X] Server owned entities
 
-- [ ] Enemies(Enemies is an abstract class that can be extended, for example add stronger units, ranged units etc.)
+- [X] Enemy
     - [X] Enemies randomly spawn around for all clients
     - [X] Enemies can take damage
     - [X] Enemies can die
-    - [ ] Enemies move towards players
-    - [ ] Enemies can attack player
+    - [X] Enemies move towards players
+    - [X] Enemies can attack player
 
-- [ ] Game loop
-    - [ ] Score
-    - [ ] End screen
-
-- [ ] Enviorment
-    - [ ] Grid based enviorment
+- [X] Enviorment
