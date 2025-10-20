@@ -1,14 +1,11 @@
 package GameObjects;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import Engine.GameObject;
 import Engine.Networking.Server;
-import GameObjects.Pickups.Pickup;
 import Engine.Vector2;
-import Engine.Inputs.Input;
 import GameObjects.Pickups.PickupManager;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Enemy extends GameObject {
     double time = 0;

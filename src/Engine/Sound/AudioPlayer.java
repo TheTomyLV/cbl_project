@@ -36,12 +36,17 @@ public class AudioPlayer {
      * Cleans up any finished clips in activeClips array.
      */
     public static void cleanUp() {
-        for (Iterator<Clip> it = activeClips.iterator(); it.hasNext();) {
-            Clip clip = it.next();
+        ArrayList<Clip> toRemoveClip = new ArrayList<>();
+        for (int i = 0; i < activeClips.size(); i++) {
+            Clip clip = activeClips.get(i);
             if (!clip.isActive()) {
                 clip.close();
-                it.remove();
+                toRemoveClip.add(clip);
             }
+        }
+
+        for (int i = 0; i < toRemoveClip.size(); i++) {
+            activeClips.remove(toRemoveClip.get(i));
         }
     }
 

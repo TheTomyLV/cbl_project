@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -34,7 +35,7 @@ public class Server extends Thread {
     private Scene currentScene;
 
     private static Server server;
-    private static final int PLAYER_COUNT = 4;
+    private static final int PLAYER_COUNT = 2;
 
     public Server() {
         Server.server = this;
@@ -53,6 +54,9 @@ public class Server extends Thread {
         ArrayList<GameObject> returnedObjects = new ArrayList<>();
         ArrayList<GameObject> serverObjects = Server.server.allObjects.get(null);
         for (int i = 0; i < serverObjects.size(); i++) {
+            if (serverObjects.get(i) == null) {
+                continue;
+            }
             if (serverObjects.get(i).isOfClass(cls)) {
                 returnedObjects.add(serverObjects.get(i));
             }
@@ -116,12 +120,20 @@ public class Server extends Thread {
      * @param deltaTime engine delta time
      */
     public void update(float deltaTime) {
+        
         tick += deltaTime;
         if (tick >= 0.0016) {
             sendServerObjects(allObjects);
             tick = 0;
         }
         ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
+
+        for (int i = gameObjects.size() - 1; i >= 0; i--) {
+            GameObject gameObject = gameObjects.get(i);
+            if (gameObject == null) {
+                gameObjects.remove(i);
+            }
+        }
 
         for (int i = 0; i < gameObjects.size(); i++) {
             GameObject gameObject = gameObjects.get(i);
@@ -141,17 +153,17 @@ public class Server extends Thread {
         }
 
         for (int i = 0; i < toRemoveClient.size(); i++) {
+            System.out.println(toRemoveClient.get(i).getUUID());
             removeClient(toRemoveClient.get(i));
         }
     }
 
     private void removeAckMessages(ArrayList<Integer> ackMessages, ClientData client) {
         ArrayList<NetMessage> messages = this.messages.get(client.getUUID());
-        for (int i = 0; i < messages.size(); i++) {
+        for (int i = messages.size() - 1; i >= 0; i--) {
             if (ackMessages.contains(messages.get(i).getId())) {
                 messages.get(i).setAcknowledged(true);
                 messages.remove(i);
-                i--;
             }
         }
     }
@@ -169,7 +181,7 @@ public class Server extends Thread {
     }
 
     private void cleanupAck(ArrayList<Integer> clientAck, ArrayList<NetMessage> messages) {
-        for (int i = 0; i < clientAck.size(); i++) {
+        for (int i = clientAck.size() - 1; i >= 0; i--) {
             int ackId = clientAck.get(i);
             boolean found = false;
             for (int j = 0; j < messages.size(); j++) {
@@ -181,7 +193,6 @@ public class Server extends Thread {
 
             if (!found) {
                 clientAck.remove(i);
-                i--;
             }
         }
     }
@@ -236,9 +247,9 @@ public class Server extends Thread {
         if (!running) {
             return;
         }
-        
-        for (Iterator<ClientData> it = clients.iterator(); it.hasNext();) {
-            ClientData client = it.next();
+
+        for (int i = 0; i < clientUUIDs.size(); i++) {
+            ClientData client = Server.getClientFromUUID(clientUUIDs.get(i));
             ArrayList<NetMessage> clientMessages = messages.get(client.getUUID());
             Packet dataPacket = new Packet(serverId, serverObjects, 
                                            clientMessages, executedMessages.get(client));
@@ -254,6 +265,7 @@ public class Server extends Thread {
                 return;
             }
         }
+        
     }
 
     /**
@@ -283,10 +295,13 @@ public class Server extends Thread {
             if (found) {
                 continue;
             }
-            clientGameObjects.add(newClientObject);
+            if (newClientObject != null) {
+                clientGameObjects.add(newClientObject);
+            }
+            
         }
 
-        for (int i = 0; i < clientGameObjects.size(); i++) {
+        for (int i = clientGameObjects.size() - 1; i >= 0; i--) {
             GameObject serverObject = clientGameObjects.get(i);
             boolean found = newGameObjects.contains(serverObject);
             
@@ -338,14 +353,17 @@ public class Server extends Thread {
 
             ClientData currentClient = new ClientData(packet.getAddress(), 
                 packet.getPort(), dataPacket.id);
-
-            addNewClient(currentClient);
+            
             
             if (clients.contains(currentClient)) {
-                currentClient.receivedPackage();
-                updateGameObjects(dataPacket.getGameObjects(), currentClient);
-                executeMessages(dataPacket.getMessages(), currentClient);
-                removeAckMessages(dataPacket.getAcknowledged(), currentClient);
+                ClientData client = Server.getClientFromUUID(currentClient.getUUID());
+                client.receivedPackage();
+                
+                updateGameObjects(dataPacket.getGameObjects(), client);
+                executeMessages(dataPacket.getMessages(), client);
+                removeAckMessages(dataPacket.getAcknowledged(), client);
+            } else {
+                addNewClient(currentClient);
             }
         }
         socket.close();

@@ -134,7 +134,9 @@ public class Packet {
         ArrayList<GameObject> objects = new ArrayList<GameObject>();
         for (int i = 0; i < objectCount; i++) {
             GameObject obj = GameObject.fromInputStream(dis);
-            objects.add(obj);
+            if (obj != null) {
+                objects.add(obj);
+            }
         }
 
         // Read messages

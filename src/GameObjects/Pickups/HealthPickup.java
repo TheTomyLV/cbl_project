@@ -16,6 +16,7 @@ public class HealthPickup extends Pickup {
     protected void setup() {
         setSprite("health_pickup");
         scale = new Vector2(0.1f, 0.1f);
+        // setLayer(-50);
     }
 
     @Override

@@ -24,13 +24,13 @@ public class GameObject implements Serializable {
     public Vector2 scale = new Vector2(1, 1);
     public float rotation = 0.0f;
     private int layerIndex = 0;
-    private boolean hasSetIndex = false;
     public Sprite currentSprite;
     private BufferedImage currentImage;
     private Class<?> myClass;
     private UUID ownerUUID;
 
     private boolean playingAnimation = false;
+    boolean needsLayerChange = false;
     private float animTime = 0f;
     private int frameIndex = 0;
     private Animation currentAnimation;
@@ -48,11 +48,8 @@ public class GameObject implements Serializable {
      * @param layer layer index
      */
     public void setLayer(int layer) {
-        if (hasSetIndex && layerIndex == layer) {
-            return;
-        }
         layerIndex = layer;
-        Engine.getCurrentScene().addToLayerChange(this);
+        needsLayerChange = true;
     }
 
     public int getLayer() {
