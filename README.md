@@ -39,19 +39,28 @@ In basic we setup an event array that is sent over the network, when the other p
 With gameObject sending over the network and network events done, we could now finish the game, as all the required tools were now in place. Some notable uses of network events include shooting, which has 3 network event types ("shoot_pistol", "shoot_shotgun", "shoot_minigun") and these events just fire when a player presses left-click and also includes player position and rotation data to know where to spawn the bullets and when the server receives any of the events it creates a bullet pattern appropirate for the gun. There is also "player_hit" event which is sent from the server by the enemy and includes the damage the player should take and when the client receives it, it just subtracts that from it's health.
 
 ### Annotations
-Learn how annotations work and use them in the networking engine
+For the network events we knew that there was a way to mark functions to the correct network event type. And for that we found out about custom annotations, that can be added to functions for example. We used [Annotations in Java](https://www.geeksforgeeks.org/java/annotations-in-java/) to setup annotations for functions, but of course this does nothing if the program does not know about them or what to do with them, for this we needed to create a function simmular for finding all the classes that extend GameObject. When all the functions were found, they were automatically added to a hashmap that containts the event type and the function to execute in form of a handler. Implementing this also allowed us to send arguments with events, as when you know the type of event, you also know the function, and java has a method for getting all arguments of a function which allowed for a simmular approach to turning the network event arguments into a byte array and back. Turning the arguments to a byte array also requires us to know how that data type needs to be converted, for that we only added basic data types as arguments as int, float, boolean etc. and also Vector2 as adding that was trivial, as it just consists of 2 float values. Other data types could also be possible to be added like GameObject as it already has a function to turn it into a byte array, but we chose not to do it, as to not encourage excesive data sending over the network. But for example sending UUID would be nice, but we didn't implement it, as we didn't need it for our game.
+
+### Final remark
+We think the game engine has turned out great. There are definetly many aspects of it that can be improved/optimized/fixed. As this is the first networking we have done, there were many instances of the server or client crashing, because implementing the networking we did not think about concurrent modification much, and this can be improved greatly, this also counts for gameObject rendering as the swing thread is different from the engine thread.
+Here are some things that could be added or improved:
+- [ ] Networking packet structure, right now it is very messy as things were just added on top of it. In hindsight gameObjects should have also be sent as network events, just with a little modification of being non-important.
+- [ ] Structure of client and server. Right now the server is a little too closely linked to it's client and should be completely seperated from it.
+- [ ] Scene rendering. GameObjects might flicker sometimes for a frame. Also the structure of client gameObjects and server recieved ones should be handled better.
+- [ ] Scenes were added to the engine, but right now they would function poorly with the given network structure, as there is no way to know what scene a client is in and server doesn't even come from a scene, but uses it's client scene to initalize objects, which goes back to the second point.
+- [ ] The game scene should adapt to the screen size, so that it zooms in or out depending of the window size.
 
 ## Todo - in priority
-- [ ] Write about advanced topics
-    - [ ] Networking
-    - [ ] Annotations
+- [X] Write about advanced topics
+    - [X] Networking
+    - [X] Annotations
 
 - [ ] Classed that need to be refactored
     - [X] Mouse.java - needs to have the correct position, as right now it's attached to the frame, but needs to be attached to the panel
     - [ ] Client.java
     - [ ] Server.java
     - [ ] Packet.java - needs to send the current scene and also add events
-    - [ ] AudioClip.java and AudioPlayer.java needs to be handled better, as the initial loading of the audio hangs the game
+    - [XD] AudioClip.java and AudioPlayer.java needs to be handled better, as the initial loading of the audio hangs the game
     - [X] Engine.java - needs to make adding and removing objects work
     - [X] Scene.java - needs to only paint gameObjects on update call
     - [X] Sprite.java - Needs to be able to get the image index for serialization
