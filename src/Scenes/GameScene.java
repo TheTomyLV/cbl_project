@@ -10,6 +10,7 @@ import GameObjects.EnemyManager;
 import GameObjects.Player;
 import GameObjects.Grass;
 import GameObjects.HealthBar;
+import GameObjects.Minimap;
 
 public class GameScene extends Scene {
     
@@ -23,5 +24,7 @@ public class GameScene extends Scene {
 
         Server.addObject(new EnemyManager());
         Server.addObject(new Grass());
+
+        addObject(new Minimap());
     }
 }
