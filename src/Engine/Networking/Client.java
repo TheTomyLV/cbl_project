@@ -31,7 +31,7 @@ public class Client extends Thread {
     // For checking the connection to server
     private ArrayList<Consumer<UUID>> onConnectedHandles = new ArrayList<>();
     private ArrayList<Consumer<UUID>> onFailedHandles = new ArrayList<>();
-    private Instant beginTime = Instant.now();
+    private ArrayList<Consumer<UUID>> onDisconnectHandles = new ArrayList<>();
 
     private byte[] sendingBuf;
     private byte[] receivingBuf = new byte[8192];
@@ -59,7 +59,6 @@ public class Client extends Thread {
      * @throws Exception failed to connect to server
      */
     public void connect(String host, int port) throws Exception {
-        beginTime = Instant.now();
         socket = new DatagramSocket();
         address = InetAddress.getByName(host);
         this.port = port;
@@ -98,6 +97,10 @@ public class Client extends Thread {
         onFailedHandles.add(handler);
     }
 
+    public void onDisconnected(Consumer<UUID> handler) {
+        onDisconnectHandles.add(handler);
+    }
+
     private void connected() {
         for(int i = 0; i < onConnectedHandles.size(); i++) {
             onConnectedHandles.get(i).accept(getClientId());
@@ -107,6 +110,12 @@ public class Client extends Thread {
     private void failedConnection() {
         for(int i = 0; i < onFailedHandles.size(); i++) {
             onFailedHandles.get(i).accept(getClientId());
+        }
+    }
+
+    private void disconnected() {
+        for(int i = 0; i < onDisconnectHandles.size(); i++) {
+            onDisconnectHandles.get(i).accept(getClientId());
         }
     }
 
@@ -148,7 +157,11 @@ public class Client extends Thread {
                 socket.setSoTimeout(2000);
                 socket.receive(packet);
             } catch (SocketTimeoutException e) {
-                failedConnection();
+                if (hasJoined) {
+                    disconnected();
+                } else {
+                    failedConnection();
+                }
                 close();
                 return;
             } catch (Exception e) {
@@ -159,6 +172,7 @@ public class Client extends Thread {
                 connected();
                 hasJoined = true;
             }
+
             Packet dataPacket = new Packet(packet.getData());
 
             gameObjects = dataPacket.getGameObjects();

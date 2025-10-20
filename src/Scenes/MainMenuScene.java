@@ -115,6 +115,9 @@ public class MainMenuScene extends Scene {
             Engine.getClient().onConnected((UUID id) -> {
                 statusLabel.setText(" ");
                 Engine.changeScene(new GameScene());
+                Engine.getClient().onDisconnected((UUID uid) -> {
+                    Engine.changeScene(new MainMenuScene());
+                });
             });
 
             Engine.getClient().onFailedConnection((UUID id) -> {

@@ -13,7 +13,6 @@ import GameObjects.HealthBar;
 
 public class GameScene extends Scene {
     
-
     @Override
     public void setupScene() {
         setBackground(new Color(91, 207, 128));

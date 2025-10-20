@@ -2,6 +2,8 @@ package Engine.Networking;
 
 import Engine.GameObject;
 import Engine.Scene;
+
+import java.lang.reflect.Array;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
@@ -125,6 +127,21 @@ public class Server extends Thread {
             GameObject gameObject = gameObjects.get(i);
             gameObject.animationUpdate(deltaTime);
             gameObject.update(deltaTime);
+        }
+
+        ArrayList<ClientData> toRemoveClient = new ArrayList<>();
+        for (int i = 0; i < clientUUIDs.size(); i++) {
+            ClientData client = Server.getClientFromUUID(Server.server.clientUUIDs.get(i));
+            if (client == null) {
+                continue;
+            }
+            if (client.lastPackage() >= 2000) {
+                toRemoveClient.add(client);
+            }
+        }
+
+        for (int i = 0; i < toRemoveClient.size(); i++) {
+            removeClient(toRemoveClient.get(i));
         }
     }
 
@@ -294,6 +311,18 @@ public class Server extends Thread {
         }
     }
 
+    private void removeClient(ClientData client) {
+        if (!clients.contains(client)) {
+            return;
+        }
+        clients.remove(client);
+        allObjects.remove(client);
+        executedMessages.remove(client);
+        messages.remove(client.getUUID());
+        clientUUIDs.remove(client.getUUID());
+        uuidHashMap.remove(client.getUUID());
+    }
+
     @Override
     public void run() {
         while (running) {
@@ -313,6 +342,7 @@ public class Server extends Thread {
             addNewClient(currentClient);
             
             if (clients.contains(currentClient)) {
+                currentClient.receivedPackage();
                 updateGameObjects(dataPacket.getGameObjects(), currentClient);
                 executeMessages(dataPacket.getMessages(), currentClient);
                 removeAckMessages(dataPacket.getAcknowledged(), currentClient);

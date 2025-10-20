@@ -55,23 +55,31 @@ public class Enemy extends GameObject {
             }
         }
 
-        rotation = closestPlayer.position.subtract(position).getRotation();
-
-        if (closestDistance < 25f) {
-            if (attackTimer > 0.5f) {
-                sendMessage("player_hit", closestPlayer.getOwnerUUID(), 10);
-                attackTimer = 0;
-            }
-        } else {
-            
-            velocity = velocity.add(new Vector2(deltaTime * speed, 0f).rotate(rotation));
-        }
+        goToClosestPlayer(deltaTime, closestPlayer, closestDistance);
 
 
 
         position = position.add(velocity);
         velocity = velocity.multiply(0.99f); // Hacky for now
     }
+
+    private void goToClosestPlayer(float deltaTime, GameObject player, float distance) {
+        if (player == null) {
+            return;
+        }
+
+        rotation = player.position.subtract(position).getRotation();
+
+        if (distance < 25f) {
+            if (attackTimer > 0.5f) {
+                sendMessage("player_hit", player.getOwnerUUID(), 10);
+                attackTimer = 0;
+            }
+        } else {
+            
+            velocity = velocity.add(new Vector2(deltaTime * speed, 0f).rotate(rotation));
+        }
+    } 
 
     public void hit(int damage) {
         health -= damage;
