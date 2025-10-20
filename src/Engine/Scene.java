@@ -66,7 +66,9 @@ public abstract class Scene extends JPanel {
 
     private void draw(Graphics g) {
         for (int i = 0; i < drawOrder.size(); i++) {
-            drawOrder.get(i).draw((Graphics2D) g);
+            if (i < drawOrder.size()) {
+                drawOrder.get(i).draw((Graphics2D) g);
+            }
         }
     }
 

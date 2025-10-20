@@ -6,10 +6,13 @@ import Engine.Scene;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.util.UUID;
 
 public class MainMenuScene extends Scene {
 
     private final Image bgImage = new ImageIcon("src/Assets/art/lobby.jpg").getImage();
+
+    private JLabel statusLabel;
 
     @Override
     public void setupScene() {
@@ -45,6 +48,12 @@ public class MainMenuScene extends Scene {
         JTextField ipTextField    = new JTextField("localhost");
         JTextField portTextField  = new JTextField("3345");
 
+        statusLabel = new JLabel(" "); 
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        statusLabel.setForeground(new Color(180, 50, 50)); 
+        statusLabel.setBorder(new EmptyBorder(4, 0, 0, 0));
+
         // Basic styling helpers
         Dimension itemSize = new Dimension(240, 36);
         styleButton(createLobbyButton, buttonFont, itemSize);
@@ -62,6 +71,7 @@ public class MainMenuScene extends Scene {
         card.add(ipTextField);
         card.add(Box.createVerticalStrut(8));
         card.add(portTextField);
+        card.add(statusLabel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -70,20 +80,67 @@ public class MainMenuScene extends Scene {
         center.add(card, gbc);
 
         createLobbyButton.addActionListener(e -> {
-            boolean ok = Engine.runServer(Integer.parseInt(portTextField.getText()));
+            Integer port = parsePort(portTextField.getText());
+            if (port == null) {
+                showError("Incorrect port number. Use 1–65535.");
+                return;
+            }
+            showInfo("Starting server on port " + port + "…");
+            boolean ok = Engine.runServer(port);
             if (ok) {
+                statusLabel.setText(" ");
                 Engine.changeScene(new GameScene());
+            } else {
+                showError("Couldn't start server.");
             }
         });
 
         joinLobbyButton.addActionListener(e -> {
-            String ip = ipTextField.getText();
-            int port  = Integer.parseInt(portTextField.getText());
-            boolean ok = Engine.runClient(ip, port);
-            if (ok) {
-                Engine.changeScene(new GameScene());
+            String ip = ipTextField.getText().trim();
+            Integer port = parsePort(portTextField.getText());
+            if (ip.isEmpty()) {
+                showError("IP address is empty.");
+                return;
             }
+            if (port == null) {
+                showError("Incorrect port number. Use 1–65535.");
+                return;
+            }
+            showInfo("Connecting to " + ip + ":" + port + "…");
+            boolean ok = Engine.runClient(ip, port);
+            if (!ok) {
+                showError("Incorrect host name.");
+                return;
+            }
+            Engine.getClient().onConnected((UUID id) -> {
+                statusLabel.setText(" ");
+                Engine.changeScene(new GameScene());
+            });
+
+            Engine.getClient().onFailedConnection((UUID id) -> {
+                showError("Couldn't join game.");
+            });
         });
+    }
+
+    private Integer parsePort(String text) {
+        try {
+            int p = Integer.parseInt(text.trim());
+            return (p >= 1 && p <= 65535) ? p : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    // Show an error message in red below the inputs
+    private void showError(String msg) {
+        statusLabel.setForeground(new Color(200, 60, 60));
+        statusLabel.setText(msg);
+    }
+
+    private void showInfo(String msg) {
+        statusLabel.setForeground(new Color(60, 120, 60));
+        statusLabel.setText(msg);
     }
 
     // Paint the background image scaled to cover the whole area

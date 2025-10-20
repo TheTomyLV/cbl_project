@@ -18,7 +18,7 @@ public class GameScene extends Scene {
     public void setupScene() {
         setBackground(new Color(91, 207, 128));
         
-        Player player = new Player(new Vector2(230, 230));
+        Player player = new Player(new Vector2(0, 0));
         addObject(player);
         addObject(new HealthBar(player));
 

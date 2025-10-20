@@ -80,7 +80,7 @@ public class Player extends GameObject {
         player.health -= damage;
         if (player.getHealth() <= 0) {
             player.health = 100;
-            player.position = new Vector2(230, 230);
+            player.position = new Vector2(0, 0);
             player.invTimer = 1f;
         }
     }

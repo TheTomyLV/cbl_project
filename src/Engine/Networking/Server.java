@@ -22,6 +22,7 @@ public class Server extends Thread {
 
     private HashSet<ClientData> clients = new HashSet<>();
     private ArrayList<UUID> clientUUIDs = new ArrayList<>();
+    private HashMap<UUID, ClientData> uuidHashMap = new HashMap<>();
     private HashMap<ClientData, ArrayList<GameObject>> allObjects = new HashMap<>();
     private HashMap<ClientData, ArrayList<Integer>> executedMessages = new HashMap<>();
     private HashMap<UUID, ArrayList<NetMessage>> messages = new HashMap<>();
@@ -101,13 +102,7 @@ public class Server extends Thread {
      * @return ClientData
      */
     public static ClientData getClientFromUUID(UUID id) {
-        for (Iterator<ClientData> it = Server.server.clients.iterator(); it.hasNext();) {
-            ClientData client = it.next();
-            if (client.getUUID() == id) {
-                return client;
-            }
-        }
-        return null;
+        return Server.server.uuidHashMap.get(id);
     }
 
     public static ArrayList<GameObject> getClientObjects(ClientData client) {
@@ -295,6 +290,7 @@ public class Server extends Thread {
             executedMessages.put(client, new ArrayList<>());
             messages.put(client.getUUID(), new ArrayList<>());
             clientUUIDs.add(client.getUUID());
+            uuidHashMap.put(client.getUUID(), client);
         }
     }
 

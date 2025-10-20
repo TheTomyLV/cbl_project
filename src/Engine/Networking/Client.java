@@ -4,9 +4,12 @@ import Engine.GameObject;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * A client class to join a server.
@@ -16,6 +19,7 @@ public class Client extends Thread {
     private InetAddress address;
     private int port;
     private boolean running;
+    private boolean hasJoined;
     private final UUID clientId;
 
     public ArrayList<GameObject> gameObjects = new ArrayList<>();
@@ -23,6 +27,11 @@ public class Client extends Thread {
     private ArrayList<Integer> ackMessages = new ArrayList<>();
     private ArrayList<NetMessage> receivedMessages = new ArrayList<>();
     private ArrayList<Integer> executedMessages = new ArrayList<>();
+
+    // For checking the connection to server
+    private ArrayList<Consumer<UUID>> onConnectedHandles = new ArrayList<>();
+    private ArrayList<Consumer<UUID>> onFailedHandles = new ArrayList<>();
+    private Instant beginTime = Instant.now();
 
     private byte[] sendingBuf;
     private byte[] receivingBuf = new byte[8192];
@@ -50,10 +59,12 @@ public class Client extends Thread {
      * @throws Exception failed to connect to server
      */
     public void connect(String host, int port) throws Exception {
+        beginTime = Instant.now();
         socket = new DatagramSocket();
         address = InetAddress.getByName(host);
         this.port = port;
         running = true;
+        hasJoined = false;
         start();
     }
 
@@ -76,6 +87,26 @@ public class Client extends Thread {
         } catch (Exception e) {
             System.out.println("Failed to send package");
             return;
+        }
+    }
+
+    public void onConnected(Consumer<UUID> handler) {
+        onConnectedHandles.add(handler);
+    }
+
+    public void onFailedConnection(Consumer<UUID> handler) {
+        onFailedHandles.add(handler);
+    }
+
+    private void connected() {
+        for(int i = 0; i < onConnectedHandles.size(); i++) {
+            onConnectedHandles.get(i).accept(getClientId());
+        }
+    }
+
+    private void failedConnection() {
+        for(int i = 0; i < onFailedHandles.size(); i++) {
+            onFailedHandles.get(i).accept(getClientId());
         }
     }
 
@@ -114,10 +145,19 @@ public class Client extends Thread {
         while (running) {
             DatagramPacket packet = new DatagramPacket(receivingBuf, receivingBuf.length);
             try {
+                socket.setSoTimeout(2000);
                 socket.receive(packet);
+            } catch (SocketTimeoutException e) {
+                failedConnection();
+                close();
+                return;
             } catch (Exception e) {
                 System.out.println("Failed to receive packet");
                 continue;
+            }
+            if (!hasJoined) {
+                connected();
+                hasJoined = true;
             }
             Packet dataPacket = new Packet(packet.getData());
 
@@ -144,5 +184,6 @@ public class Client extends Thread {
         running = false;
         port = 0;
         address = null;
+        hasJoined = false;
     }
 }
