@@ -29,11 +29,11 @@ public class Sprite {
         this.index = index;
     }
 
-    BufferedImage getImage() {
+    public BufferedImage getImage() {
         return image;
     }
 
-    Vector2 getPivot() {
+    public Vector2 getPivot() {
         return pivot;
     }
 

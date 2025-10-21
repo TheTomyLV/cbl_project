@@ -47,16 +47,19 @@ public class Player extends GameObject {
                 reloadTime = 0.3f;
                 weaponAttackType = "shoot_pistol";
                 setSprite("player_pistol");
+                WeaponSelect.selectWeapon(0);
                 break;
             case 1:
                 reloadTime = 0.9f;
                 weaponAttackType = "shoot_shotgun";
                 setSprite("player_sg");
+                WeaponSelect.selectWeapon(1);
                 break;
             case 2:
                 reloadTime = 0.1f;
                 weaponAttackType = "shoot_minigun";
                 setSprite("player_mg");
+                WeaponSelect.selectWeapon(2);
                 break;
             default:
                 break;
@@ -155,11 +158,9 @@ public class Player extends GameObject {
 
         if (Input.isKeyPressed(KeyEvent.VK_1)) {
             selectWeapon(0);
-        }
-        if (Input.isKeyPressed(KeyEvent.VK_2)) {
+        } else if (Input.isKeyPressed(KeyEvent.VK_2)) {
             selectWeapon(1);
-        }
-        if (Input.isKeyPressed(KeyEvent.VK_3)) {
+        } else if (Input.isKeyPressed(KeyEvent.VK_3)) {
             selectWeapon(2);
         }
 

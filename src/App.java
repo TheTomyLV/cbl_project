@@ -41,6 +41,10 @@ public class App {
         Sprite.loadImage("city", artAssetPath + "city.png", new Vector2(0.5f, 0.5f));
         Sprite.loadImage("health", artAssetPath + "health.png", new Vector2(0f, 0.5f));
         Sprite.loadImage("health_pickup", artAssetPath + "health_pickup.png", new Vector2(0.5f, 0.5f));
+
+        Sprite.loadImage("pistol", artAssetPath + "pistol.png", new Vector2(0.5f, 0.5f));
+        Sprite.loadImage("rifle", artAssetPath + "rifle.png", new Vector2(0.5f, 0.5f));
+        Sprite.loadImage("shotgun", artAssetPath + "shotgun.png", new Vector2(0.5f, 0.5f));
     }
 
     public void run() {

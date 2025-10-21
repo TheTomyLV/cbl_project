@@ -8,6 +8,8 @@ import GameObjects.Background;
 import GameObjects.HealthBar;
 import GameObjects.Minimap;
 import GameObjects.Player;
+import GameObjects.WeaponSelect;
+
 import java.awt.Color;
 
 /**
@@ -19,10 +21,13 @@ public class GameScene extends Scene {
     public void setupScene() {
         setBackground(new Color(35, 42, 46));
         
+        WeaponSelect.createIcons(this);
         Player player = new Player(new Vector2(0, 0));
         addObject(player);
         addObject(new HealthBar(player));
         addObject(new Minimap());
+
+        
 
         Server.addObject(new EnemyManager());
         Server.addObject(new Background());
