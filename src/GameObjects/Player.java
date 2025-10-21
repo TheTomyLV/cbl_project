@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class Player extends GameObject {
     double time = 0f;
-    float speed = 300f;
+    float speed = 200f;
     Vector2 velocity = new Vector2(0f, 0f);
     AudioClip shootSfx = new AudioClip("src\\Assets\\audio\\shoot.wav");
     static AudioClip pickupSfx = new AudioClip("src\\Assets\\audio\\pickup.wav");
