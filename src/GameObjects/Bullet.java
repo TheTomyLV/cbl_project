@@ -1,20 +1,26 @@
 package GameObjects;
 
+import Engine.GameObject;
+import Engine.Networking.NetEvent;
+import Engine.Networking.Server;
+import Engine.Vector2;
 import java.util.ArrayList;
 import java.util.Random;
 
-import Engine.Engine;
-import Engine.GameObject;
-import Engine.Vector2;
-import Engine.Networking.NetEvent;
-import Engine.Networking.Server;
-
+/**
+ * A basic bullet class.
+ */
 public class Bullet extends GameObject {
     float time = 0f;
     float speed = 400f;
     int damage;
     Vector2 velocity = new Vector2(0f, 0f);
 
+    /**
+     * An event that is fired when player shoots a pistol.
+     * @param position player position
+     * @param rotation player rotation
+     */
     @NetEvent("shoot_pistol")
     public static void shootPistol(Vector2 position, float rotation) {
         Vector2 offset = new Vector2(50f, 7f).rotate(rotation);
@@ -22,16 +28,27 @@ public class Bullet extends GameObject {
         Server.addObject(new Bullet(bulletPosition, rotation, 20));
     }
 
+    /**
+     * An event that is fired when player shoots a shotgun.
+     * @param position player position
+     * @param rotation player rotation
+     */
     @NetEvent("shoot_shotgun")
     public static void shootShotgun(Vector2 position, float rotation) {
         Vector2 offset = new Vector2(45f, -6f).rotate(rotation);
         Vector2 bulletPosition = position.add(offset);
         Random rng = new Random();
+        float randomRotation = rotation + rng.nextFloat(-25.0f, 25.0f);
         for (int i = 0; i < 8; i++) {
-            Server.addObject(new Bullet(bulletPosition, rotation + rng.nextFloat(-25.0f, 25.0f), 5));
+            Server.addObject(new Bullet(bulletPosition, randomRotation, 5));
         }
     }
 
+    /**
+     * An event that is fired when player shoots a rifle.
+     * @param position player position
+     * @param rotation player rotation
+     */
     @NetEvent("shoot_minigun")
     public static void shootMinigun(Vector2 position, float rotation) {
         Random rng = new Random();
@@ -40,6 +57,12 @@ public class Bullet extends GameObject {
         Server.addObject(new Bullet(bulletPosition, rotation + rng.nextFloat(-5.0f, 5.0f), 5));
     }
 
+    /**
+     * Creates a bullet.
+     * @param position bullet position
+     * @param rotation bullet rotation
+     * @param damage bullet damage
+     */
     public Bullet(Vector2 position, float rotation, int damage) {
         this.position = position;
         this.rotation = rotation;

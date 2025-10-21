@@ -120,7 +120,7 @@ public abstract class Scene extends JPanel {
 
     public abstract void setupScene();
 
-    public void addToLayerChange(GameObject gameObject) {
+    private void addToLayerChange(GameObject gameObject) {
         if (layerChange.contains(gameObject)) {
             return;
         }

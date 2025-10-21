@@ -1,17 +1,18 @@
 package Scenes;
 
 import Engine.Networking.Server;
-
-import java.awt.Color;
-
 import Engine.Scene;
 import Engine.Vector2;
 import GameObjects.EnemyManager;
-import GameObjects.Player;
 import GameObjects.Grass;
 import GameObjects.HealthBar;
 import GameObjects.Minimap;
+import GameObjects.Player;
+import java.awt.Color;
 
+/**
+ * Main game scene.
+ */
 public class GameScene extends Scene {
     
     @Override

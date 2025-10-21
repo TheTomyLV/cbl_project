@@ -1,14 +1,18 @@
 package GameObjects.Pickups;
 
-import java.util.ArrayList;
-
-import Engine.GameObject;
-import Engine.Vector2;
 import Engine.Networking.Server;
-import GameObjects.Player;
+import Engine.Vector2;
 
+/**
+ * A pickup manager that spawns pickups.
+ */
 public class PickupManager {
 
+    /**
+     * Creates a pickup on the ground.
+     * @param position pickup position
+     * @param type pickup type
+     */
     public static void createPickup(Vector2 position, String type) {
         switch (type) {
             case "health_pickup":

@@ -4,18 +4,15 @@ import Engine.Inputs.Input;
 import Engine.Networking.Client;
 import Engine.Networking.NetMessage;
 import Engine.Networking.Server;
-
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -67,13 +64,15 @@ public class Engine {
             }
         });
 
-
-        jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.addKeyListener(input);
         
         new Camera();
         running = true;
+    }
+
+    public static void showWindow() {
+        jFrame.setVisible(true);
     }
 
     /**

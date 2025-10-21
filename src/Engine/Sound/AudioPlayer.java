@@ -1,7 +1,6 @@
 package Engine.Sound;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import javax.sound.sampled.Clip;
 
 /**

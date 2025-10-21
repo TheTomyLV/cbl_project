@@ -11,8 +11,14 @@ public class Mouse {
     Vector2 position = new Vector2(0, 0);
     boolean[] clicked = new boolean[3];
 
+    /**
+     * Gets mouse position in the game world.
+     * @return mouse position in the game world
+     */
     public Vector2 getWorldPosition() {
-        Vector2 panelDimensions = new Vector2(Engine.getCurrentScene().getWidth() / 2, Engine.getCurrentScene().getHeight() / 2);
+        float halfWidth = Engine.getCurrentScene().getWidth() / 2;
+        float halfHeight = Engine.getCurrentScene().getHeight() / 2;
+        Vector2 panelDimensions = new Vector2(halfWidth, halfHeight);
         return position.subtract(panelDimensions).add(Camera.currentCamera.position);
     }
 

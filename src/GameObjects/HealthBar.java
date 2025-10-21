@@ -3,6 +3,9 @@ package GameObjects;
 import Engine.GameObject;
 import Engine.Vector2;
 
+/**
+ * Healthbar gameObject that displays the player health above the player.
+ */
 public class HealthBar extends GameObject {
     
     Player player;

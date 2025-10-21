@@ -2,12 +2,14 @@ package Scenes;
 
 import Engine.Engine;
 import Engine.Scene;
-
+import java.util.UUID;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
-import java.util.UUID;
 
+/**
+ * Main menu scene for joining and creating a game.
+ */
 public class MainMenuScene extends Scene {
 
     private final Image bgImage = new ImageIcon("src/Assets/art/lobby.jpg").getImage();

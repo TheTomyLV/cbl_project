@@ -1,9 +1,12 @@
 package GameObjects.Pickups;
 
 import Engine.GameObject;
-import Engine.Vector2;
 import Engine.Networking.Server;
+import Engine.Vector2;
 
+/**
+ * A health pickup.
+ */
 public class HealthPickup extends Pickup {
     
     int givenHealth;

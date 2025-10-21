@@ -3,6 +3,9 @@ package GameObjects;
 import Engine.GameObject;
 import Engine.Vector2;
 
+/**
+ * Background grass.
+ */
 public class Grass extends GameObject {
     
     @Override

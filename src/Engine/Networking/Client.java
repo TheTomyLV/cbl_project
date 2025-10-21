@@ -101,19 +101,19 @@ public class Client extends Thread {
     }
 
     private void connected() {
-        for(int i = 0; i < onConnectedHandles.size(); i++) {
+        for (int i = 0; i < onConnectedHandles.size(); i++) {
             onConnectedHandles.get(i).accept(getClientId());
         }
     }
 
     private void failedConnection() {
-        for(int i = 0; i < onFailedHandles.size(); i++) {
+        for (int i = 0; i < onFailedHandles.size(); i++) {
             onFailedHandles.get(i).accept(getClientId());
         }
     }
 
     private void disconnected() {
-        for(int i = 0; i < onDisconnectHandles.size(); i++) {
+        for (int i = 0; i < onDisconnectHandles.size(); i++) {
             onDisconnectHandles.get(i).accept(getClientId());
         }
     }

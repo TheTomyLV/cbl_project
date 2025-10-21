@@ -6,13 +6,15 @@ import Engine.Engine;
 import Engine.GameObject;
 import Engine.Inputs.Input;
 import Engine.Networking.NetEvent;
-import Engine.Networking.Server;
 import Engine.Sound.AudioClip;
 import Engine.Sound.AudioPlayer;
 import Engine.Vector2;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+/**
+ * A player gameObject.
+ */
 public class Player extends GameObject {
     double time = 0f;
     float speed = 2.0f;
@@ -65,6 +67,10 @@ public class Player extends GameObject {
         this.position = position;
     }
 
+    /**
+     * An event that is fired when player takes damage.
+     * @param damage amount of damage to take
+     */
     @NetEvent("player_hit")
     public static void hit(int damage) {
         ArrayList<GameObject> players = Engine.getCurrentScene().getObjectsOfClass(Player.class);
@@ -85,6 +91,10 @@ public class Player extends GameObject {
         }
     }
 
+    /**
+     * An event that is fired when the player picks up a health pickup.
+     * @param health the amount of health to give to the player
+     */
     @NetEvent("health_pickup")
     public static void healthPickup(int health) {
         ArrayList<GameObject> players = Engine.getCurrentScene().getObjectsOfClass(Player.class);

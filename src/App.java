@@ -1,8 +1,8 @@
 import Engine.ClassManager;
 import Engine.Engine;
+import Engine.Networking.NetworkHandleRegister;
 import Engine.Sprite;
 import Engine.Vector2;
-import Engine.Networking.NetworkHandleRegister;
 import Scenes.MainMenuScene;
 
 /**
@@ -10,20 +10,7 @@ import Scenes.MainMenuScene;
  */
 public class App {
 
-    public void run() {
-        // Initializes engine
-        Engine.start();
-        Engine.setWindowIcon("src\\Assets\\art\\player\\smith_pistol.png");
-        Engine.setWindowName("Co-op Cop");
-
-        // Register netowork events
-        NetworkHandleRegister.registerAllGameObjectHandlers("GameObjects");
-
-        // Register GameObjects
-        ClassManager.registerClassesFromBasePackage("GameObjects");
-        // Register scenes
-        ClassManager.registerClassesFromBasePackage("Scenes");
-
+    private void loadImages() {
         // Art asset path
         String artAssetPath = "src\\Assets\\art\\";
 
@@ -54,6 +41,24 @@ public class App {
         Sprite.loadImage("grass", artAssetPath + "grass.png", new Vector2(0.5f, 0.5f));
         Sprite.loadImage("health", artAssetPath + "health.png", new Vector2(0f, 0.5f));
         Sprite.loadImage("health_pickup", artAssetPath + "health_pickup.png", new Vector2(0.5f, 0.5f));
+    }
+
+    public void run() {
+        // Initializes engine
+        Engine.start();
+        Engine.setWindowIcon("src\\Assets\\art\\player\\smith_pistol.png");
+        Engine.setWindowName("Co-op Cop");
+        Engine.showWindow();
+
+        // Register netowork events
+        NetworkHandleRegister.registerAllGameObjectHandlers("GameObjects");
+
+        // Register GameObjects
+        ClassManager.registerClassesFromBasePackage("GameObjects");
+        // Register scenes - not used
+        ClassManager.registerClassesFromBasePackage("Scenes");
+
+        loadImages();
         
         // Load starting scene
         Engine.changeScene(new MainMenuScene());

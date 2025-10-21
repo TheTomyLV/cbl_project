@@ -7,6 +7,9 @@ import GameObjects.Pickups.PickupManager;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * A basic enemy class.
+ */
 public class Enemy extends GameObject {
     double time = 0;
     float speed = 0.5f;
@@ -78,6 +81,10 @@ public class Enemy extends GameObject {
         }
     } 
 
+    /**
+     * Called when this enemy takes damage.
+     * @param damage ddamage to take
+     */
     public void hit(int damage) {
         health -= damage;
         hitAnim = 0.05f;
