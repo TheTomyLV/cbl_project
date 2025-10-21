@@ -38,8 +38,9 @@ public class Bullet extends GameObject {
         Vector2 offset = new Vector2(45f, -6f).rotate(rotation);
         Vector2 bulletPosition = position.add(offset);
         Random rng = new Random();
-        float randomRotation = rotation + rng.nextFloat(-25.0f, 25.0f);
+        
         for (int i = 0; i < 8; i++) {
+            float randomRotation = rotation + rng.nextFloat(-25.0f, 25.0f);
             Server.addObject(new Bullet(bulletPosition, randomRotation, 5));
         }
     }

@@ -17,7 +17,7 @@ public class GameScene extends Scene {
     
     @Override
     public void setupScene() {
-        setBackground(new Color(91, 207, 128));
+        setBackground(new Color(35, 42, 46));
         
         Player player = new Player(new Vector2(0, 0));
         addObject(player);

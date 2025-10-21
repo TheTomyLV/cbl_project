@@ -38,7 +38,7 @@ public class App {
         Sprite.loadImage("bullet", artAssetPath + "bullet.png", new Vector2(0.85f, 0.5f));
         Sprite.loadImage("zombie", artAssetPath + "descrom.png", new Vector2(0.3f, 0.5f));
         Sprite.loadImage("zombie_hit", artAssetPath + "descrom_hit.png", new Vector2(0.3f, 0.5f));
-        Sprite.loadImage("grass", artAssetPath + "grass.png", new Vector2(0.5f, 0.5f));
+        Sprite.loadImage("grass", artAssetPath + "city.png", new Vector2(0.5f, 0.5f));
         Sprite.loadImage("health", artAssetPath + "health.png", new Vector2(0f, 0.5f));
         Sprite.loadImage("health_pickup", artAssetPath + "health_pickup.png", new Vector2(0.5f, 0.5f));
     }
