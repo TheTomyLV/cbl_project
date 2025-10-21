@@ -6,11 +6,11 @@ import Engine.Vector2;
 /**
  * Background grass.
  */
-public class Grass extends GameObject {
+public class Background extends GameObject {
     
     @Override
     protected void setup() {
-        setSprite("grass");
+        setSprite("city");
         scale = new Vector2(0.4f, 0.4f);
         setLayer(-100);
     }

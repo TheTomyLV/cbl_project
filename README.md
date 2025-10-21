@@ -54,6 +54,13 @@ Here are some things that could be added or improved:
 - [ ] Scenes were added to the engine, but right now they would function poorly with the given network structure, as there is no way to know what scene a client is in and server doesn't even come from a scene, but uses it's client scene to initalize objects, which goes back to the second point.
 - [ ] The game scene should adapt to the screen size, so that it zooms in or out depending of the window size.
 
+## How to play
+    In the main menu, the host writes a port and starts a game.
+    Other clients write a port and server ip address to join.
+    There are 3 different weapon types, that you can select with 1-3.
+    When the player dies, he respawns with 1 second invincibility frames.
+
+
 ## Todo - in priority
 - [X] Write about advanced topics
     - [X] Networking

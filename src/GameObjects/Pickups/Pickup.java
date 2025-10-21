@@ -11,11 +11,14 @@ import java.util.ArrayList;
 public abstract class Pickup extends GameObject {
     
     float pickupDistance = 20f;
+    float despawnTime = 10f;
+    float time = 0;
 
     public abstract void onPickUp(GameObject player);
-    
+
     @Override
     public void update(float deltaTime) {
+        time += deltaTime;
         ArrayList<GameObject> playerObjects = Server.getClientObjectOfClass(Player.class);
 
         float closestDistance = Float.MAX_VALUE;
@@ -30,6 +33,10 @@ public abstract class Pickup extends GameObject {
 
         if (closestDistance < pickupDistance) {
             onPickUp(closestPlayer);
+        }
+
+        if (time >= despawnTime) {
+            Server.removeObject(this);
         }
     }
 }

@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class Player extends GameObject {
     double time = 0f;
-    float speed = 2.0f;
+    float speed = 300f;
     Vector2 velocity = new Vector2(0f, 0f);
     AudioClip shootSfx = new AudioClip("src\\Assets\\audio\\shoot.wav");
     static AudioClip pickupSfx = new AudioClip("src\\Assets\\audio\\pickup.wav");
@@ -165,20 +165,20 @@ public class Player extends GameObject {
 
         // Movement
         if (Input.isKeyPressed(KeyEvent.VK_W)) {
-            velocity.y -= deltaTime * speed;
+            velocity.y -= speed;
         }
         if (Input.isKeyPressed(KeyEvent.VK_S)) {
-            velocity.y += deltaTime * speed;
+            velocity.y += speed;
         }
         if (Input.isKeyPressed(KeyEvent.VK_A)) {
-            velocity.x -= deltaTime * speed;
+            velocity.x -= speed;
         }
         if (Input.isKeyPressed(KeyEvent.VK_D)) {
-            velocity.x += deltaTime * speed;
+            velocity.x += speed;
         }
 
-        position = position.add(velocity);
-        velocity = velocity.multiply(0.99f); // Hacky for now
+        position = position.add(velocity.multiply(deltaTime));
+        velocity = new Vector2(0, 0);
         rotation = Input.mouse.getWorldPosition().subtract(position).getRotation();
 
         // Shooting
@@ -189,6 +189,19 @@ public class Player extends GameObject {
             sendMessage(weaponAttackType, bulletPosition, rotation);
             time = 0;
             playAnimation(animations.get(selectedWeapon));
+        }
+
+        if (position.y < -910) {
+            position.y = -910;
+        }
+        if (position.x < -1300) {
+            position.x = -1300;
+        }
+        if (position.y > 920) {
+            position.y = 920;
+        }
+        if (position.x > 1350) {
+            position.x = 1350;
         }
 
         Camera.currentCamera.position = position;

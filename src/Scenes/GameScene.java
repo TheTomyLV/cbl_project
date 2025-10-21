@@ -4,7 +4,7 @@ import Engine.Networking.Server;
 import Engine.Scene;
 import Engine.Vector2;
 import GameObjects.EnemyManager;
-import GameObjects.Grass;
+import GameObjects.Background;
 import GameObjects.HealthBar;
 import GameObjects.Minimap;
 import GameObjects.Player;
@@ -25,6 +25,6 @@ public class GameScene extends Scene {
         addObject(new Minimap());
 
         Server.addObject(new EnemyManager());
-        Server.addObject(new Grass());
+        Server.addObject(new Background());
     }
 }

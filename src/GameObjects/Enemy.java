@@ -12,7 +12,7 @@ import java.util.Random;
  */
 public class Enemy extends GameObject {
     double time = 0;
-    float speed = 0.5f;
+    float speed = 75f;
     Vector2 velocity = new Vector2(0f, 0f);
     int health = 50;
     float hitAnim = 0f;
@@ -59,8 +59,21 @@ public class Enemy extends GameObject {
 
 
 
-        position = position.add(velocity);
-        velocity = velocity.multiply(0.99f); // Hacky for now
+        position = position.add(velocity.multiply(deltaTime));
+        velocity = new Vector2(0, 0);
+
+        if (position.y < -910) {
+            position.y = -910;
+        }
+        if (position.x < -1300) {
+            position.x = -1300;
+        }
+        if (position.y > 920) {
+            position.y = 920;
+        }
+        if (position.x > 1350) {
+            position.x = 1350;
+        }
     }
 
     private void goToClosestPlayer(float deltaTime, GameObject player, float distance) {
@@ -77,7 +90,7 @@ public class Enemy extends GameObject {
             }
         } else {
             
-            velocity = velocity.add(new Vector2(deltaTime * speed, 0f).rotate(rotation));
+            velocity = velocity.add(new Vector2(speed, 0f).rotate(rotation));
         }
     } 
 
