@@ -28,6 +28,7 @@ public class Server extends Thread {
     private HashMap<UUID, ArrayList<NetMessage>> messages = new HashMap<>();
 
     private final UUID serverId = new UUID(0, 0);
+    private ClientData serverClientData;
     private float tick = 0f;
     private Scene currentScene;
 
@@ -49,7 +50,7 @@ public class Server extends Thread {
      */
     public static ArrayList<GameObject> getServerObjectOfClass(Class<?> cls) {
         ArrayList<GameObject> returnedObjects = new ArrayList<>();
-        ArrayList<GameObject> serverObjects = Server.server.allObjects.get(null);
+        ArrayList<GameObject> serverObjects = Server.server.allObjects.get(Server.server.serverClientData);
         for (int i = 0; i < serverObjects.size(); i++) {
             if (serverObjects.get(i) == null) {
                 continue;
@@ -88,9 +89,10 @@ public class Server extends Thread {
      * @throws Exception throws an exception if server cannot be opened
      */
     public void startServer(int port) throws Exception {
-        allObjects.put(null, new ArrayList<>());
         socket = new DatagramSocket(port);
         this.port = port;
+        serverClientData = new ClientData(socket.getInetAddress(), port, serverId);
+        allObjects.put(serverClientData, new ArrayList<>());
         running = true;
         start();
     }
@@ -117,13 +119,16 @@ public class Server extends Thread {
      * @param deltaTime engine delta time
      */
     public void update(float deltaTime) {
+        if (!running) {
+            return;
+        }
         
         tick += deltaTime;
         if (tick >= 0.0016) {
             sendServerObjects(allObjects);
             tick = 0;
         }
-        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
+        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(serverClientData);
 
         for (int i = gameObjects.size() - 1; i >= 0; i--) {
             GameObject gameObject = gameObjects.get(i);
@@ -210,7 +215,7 @@ public class Server extends Thread {
             return;
         }
 
-        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
+        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(Server.server.serverClientData);
         if (!gameObjects.contains(gameObject)) {
             gameObject.setOwnerUUID(Server.server.serverId);
             gameObjects.add(gameObject);
@@ -225,7 +230,7 @@ public class Server extends Thread {
         if (Server.server == null) {
             return;
         }
-        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(null);
+        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(Server.server.serverClientData);
         if (gameObjects.contains(gameObject)) {
             gameObject.onDestroy();
             gameObjects.remove(gameObject);
@@ -233,7 +238,7 @@ public class Server extends Thread {
     }
 
     public static ArrayList<GameObject> getObjects() {
-        return Server.server.allObjects.get(null);
+        return Server.server.allObjects.get(Server.server.serverClientData);
     }
 
     public static void changeScene(Scene scene) {

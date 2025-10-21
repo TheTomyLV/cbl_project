@@ -45,7 +45,7 @@ public class WeaponSelect extends GameObject {
         }
 
         WeaponSelect weapon = weaponIcons.get(weaponIndex);
-        weapon.scale = new Vector2(0.05f, 0.05f);
+        weapon.scale = new Vector2(0.5f, 0.5f);
         selectedWeapon = weaponIndex;
     }
 
