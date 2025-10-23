@@ -61,7 +61,7 @@ public class App {
             new Vector2(0.5f, 0.5f));
         Sprite.loadImage("health", artAssetPath + "health.png", 
             new Vector2(0f, 0.5f));
-        Sprite.loadImage("health_pickup", artAssetPath + "health_pickup.png", 
+        Sprite.loadImage("health_pickup", artAssetPath + "medkit.png", 
             new Vector2(0.5f, 0.5f));
 
         // Weapon icons

@@ -73,7 +73,7 @@ public class Bullet extends GameObject {
     @Override
     protected void setup() {
         setSprite("bullet");
-        scale = new Vector2(0.025f, 0.025f);
+        scale = new Vector2(0.1f, 0.1f);
     }
 
     @Override
