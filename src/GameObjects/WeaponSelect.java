@@ -1,20 +1,25 @@
 package GameObjects;
 
+import Engine.GameObject;
+import Engine.Scene;
+import Engine.Vector2;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import Engine.GameObject;
-import Engine.Scene;
-import Engine.Vector2;
-import Engine.Engine;
-
+/**
+ * Displays weapon icons below minimap.
+ */
 public class WeaponSelect extends GameObject {
     static ArrayList<WeaponSelect> weaponIcons = new ArrayList<>();
     static int selectedWeapon = -1;
     BufferedImage image;
 
+    /**
+     * Create icons in scene.
+     * @param scene scene to create icons in
+     */
     public static void createIcons(Scene scene) {
         WeaponSelect pistol = new WeaponSelect("pistol");
         WeaponSelect shotgun = new WeaponSelect("shotgun");
@@ -38,6 +43,10 @@ public class WeaponSelect extends GameObject {
         }
     }
 
+    /**
+     * Set the currently selected weapon.
+     * @param weaponIndex weapon index 0 - pistol, 1 - shotgun, 2 - rifle
+     */
     public static void selectWeapon(int weaponIndex) {
         if (weaponIndex == selectedWeapon) {
             return;
@@ -65,6 +74,10 @@ public class WeaponSelect extends GameObject {
         g2d.drawImage(image, at, null);
     }
 
+    /**
+     * Create a weapon icon.
+     * @param imageName icon image
+     */
     WeaponSelect(String imageName) {
         scale = new Vector2(0.05f, 0.05f);
         setSprite(imageName);

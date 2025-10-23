@@ -3,7 +3,6 @@ package GameObjects;
 import Engine.GameObject;
 import Engine.Networking.Server;
 import Engine.Vector2;
-
 import java.util.ArrayList;
 import java.util.Random;
 

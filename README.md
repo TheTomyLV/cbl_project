@@ -55,6 +55,7 @@ Here are some things that could be added or improved:
 - [ ] The game scene should adapt to the screen size, so that it zooms in or out depending of the window size.
 
 ## How to play
+    Make sure that the asset path for image and audio assets is correct, if the top folder is not source, you should search in the project src\\Assets and change the top folder, these should only be in App.java and GameObjects\Player.java.
     In the main menu, the host writes a port and starts a game.
     Other clients write a port and server ip address to join.
     There are 3 different weapon types, that you can select with 1-3.

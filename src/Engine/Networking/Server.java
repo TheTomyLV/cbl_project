@@ -1,7 +1,6 @@
 package Engine.Networking;
 
 import Engine.GameObject;
-import Engine.Scene;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ public class Server extends Thread {
     private final UUID serverId = new UUID(0, 0);
     private ClientData serverClientData;
     private float tick = 0f;
-    private Scene currentScene;
 
     private static Server server;
     private static final int PLAYER_COUNT = 2;
@@ -50,7 +48,8 @@ public class Server extends Thread {
      */
     public static ArrayList<GameObject> getServerObjectOfClass(Class<?> cls) {
         ArrayList<GameObject> returnedObjects = new ArrayList<>();
-        ArrayList<GameObject> serverObjects = Server.server.allObjects.get(Server.server.serverClientData);
+        ArrayList<GameObject> serverObjects = Server.server.allObjects.get(
+                Server.server.serverClientData);
         for (int i = 0; i < serverObjects.size(); i++) {
             if (serverObjects.get(i) == null) {
                 continue;
@@ -81,6 +80,10 @@ public class Server extends Thread {
             }
         }
         return returnedObjects;
+    }
+
+    public static int getPort() {
+        return Server.server.port;
     }
 
     /**
@@ -215,7 +218,8 @@ public class Server extends Thread {
             return;
         }
 
-        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(Server.server.serverClientData);
+        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(
+                Server.server.serverClientData);
         if (!gameObjects.contains(gameObject)) {
             gameObject.setOwnerUUID(Server.server.serverId);
             gameObjects.add(gameObject);
@@ -230,7 +234,8 @@ public class Server extends Thread {
         if (Server.server == null) {
             return;
         }
-        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(Server.server.serverClientData);
+        ArrayList<GameObject> gameObjects = Server.server.allObjects.get(
+                Server.server.serverClientData);
         if (gameObjects.contains(gameObject)) {
             gameObject.onDestroy();
             gameObjects.remove(gameObject);
@@ -239,10 +244,6 @@ public class Server extends Thread {
 
     public static ArrayList<GameObject> getObjects() {
         return Server.server.allObjects.get(Server.server.serverClientData);
-    }
-
-    public static void changeScene(Scene scene) {
-        Server.server.currentScene = scene;
     }
 
     private void sendServerObjects(HashMap<ClientData, ArrayList<GameObject>> serverObjects) {

@@ -2,10 +2,29 @@ package Scenes;
 
 import Engine.Engine;
 import Engine.Scene;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.util.UUID;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 /**
  * Main menu scene for joining and creating a game.
@@ -34,12 +53,8 @@ public class MainMenuScene extends Scene {
                 new EmptyBorder(18, 22, 18, 22)
         ));
 
-        // fonts
-        Font titleFont  = new Font("Segoe UI", Font.BOLD, 22);
-        Font buttonFont = new Font("Segoe UI", Font.BOLD, 16);
-        Font fieldFont  = new Font("Segoe UI", Font.PLAIN, 14);
-
         // Title
+        Font titleFont  = new Font("Segoe UI", Font.BOLD, 22);
         JLabel title = new JLabel("Co-op cop", SwingConstants.CENTER);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setFont(titleFont);
@@ -57,6 +72,8 @@ public class MainMenuScene extends Scene {
         statusLabel.setBorder(new EmptyBorder(4, 0, 0, 0));
 
         // Basic styling helpers
+        Font buttonFont = new Font("Segoe UI", Font.BOLD, 16);
+        Font fieldFont  = new Font("Segoe UI", Font.PLAIN, 14);
         Dimension itemSize = new Dimension(240, 36);
         styleButton(createLobbyButton, buttonFont, itemSize);
         styleButton(joinLobbyButton,   buttonFont, itemSize);

@@ -3,13 +3,12 @@ package Scenes;
 import Engine.Networking.Server;
 import Engine.Scene;
 import Engine.Vector2;
-import GameObjects.EnemyManager;
 import GameObjects.Background;
+import GameObjects.EnemyManager;
 import GameObjects.HealthBar;
 import GameObjects.Minimap;
 import GameObjects.Player;
 import GameObjects.WeaponSelect;
-
 import java.awt.Color;
 
 /**
