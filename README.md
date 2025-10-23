@@ -4,7 +4,7 @@ A multiplayer game where players cooperate to kill enemies that come towards the
 ## Advanced topic choices
 ### Networking
 #### Network communication type
-There are two types of communication in networking tcp and udp, we already knew the basics of they work.
+There are two types of communication in networking tcp and udp, we already knew the basics of how they work.
 We decided to go with udp, as that is most used in real time games, which this is.
 Udp is a connection, where packets sent can be lost and not delivered, as that is not checked when sending out a packet, unlike tcp where it waits when sending a packet to make sure it's delivered, which causes delays. Udp does not have this problem as it just sends the packet and forgets about it. 
 We used this tutorial [A Guide to UDP In Java](https://www.baeldung.com/udp-in-java) to set up a basic server client communication. 
@@ -71,7 +71,7 @@ Here are some things that could be added or improved:
     - [ ] Client.java
     - [ ] Server.java
     - [ ] Packet.java - needs to send the current scene and also add events
-    - [XD] AudioClip.java and AudioPlayer.java needs to be handled better, as the initial loading of the audio hangs the game
+    - [X] AudioClip.java and AudioPlayer.java needs to be handled better, as the initial loading of the audio hangs the game
     - [X] Engine.java - needs to make adding and removing objects work
     - [X] Scene.java - needs to only paint gameObjects on update call
     - [X] Sprite.java - Needs to be able to get the image index for serialization

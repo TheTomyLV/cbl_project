@@ -2,6 +2,7 @@ package GameObjects;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import Engine.GameObject;
@@ -12,6 +13,7 @@ import Engine.Engine;
 public class WeaponSelect extends GameObject {
     static ArrayList<WeaponSelect> weaponIcons = new ArrayList<>();
     static int selectedWeapon = -1;
+    BufferedImage image;
 
     public static void createIcons(Scene scene) {
         WeaponSelect pistol = new WeaponSelect("pistol");
@@ -51,21 +53,23 @@ public class WeaponSelect extends GameObject {
 
     @Override
     protected void draw(Graphics2D g2d) {
-        if (currentSprite == null) {
+        if (image == null) {
             return;
         }
         AffineTransform at = new AffineTransform();
         at.translate(position.x, position.y);
         at.rotate(Math.toRadians(rotation));
         at.scale(scale.x, scale.y);
-        at.translate(-currentSprite.getImage().getWidth() * currentSprite.getPivot().x, 
-            -currentSprite.getImage().getHeight() * currentSprite.getPivot().y);
-        g2d.drawImage(currentSprite.getImage(), at, null);
+        at.translate(-image.getWidth() * 0.5f, 
+            -image.getHeight() * 0.5f);
+        g2d.drawImage(image, at, null);
     }
 
     WeaponSelect(String imageName) {
         scale = new Vector2(0.05f, 0.05f);
         setSprite(imageName);
+        image = currentSprite.getImage();
+        setSprite(null);
         setLayer(1000);
     }
 }

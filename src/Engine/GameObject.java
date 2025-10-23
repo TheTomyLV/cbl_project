@@ -154,12 +154,21 @@ public class GameObject implements Serializable {
      */
     public void setSprite(String name) {
         currentSprite = Sprite.getSprite(name);
-        currentImage = currentSprite.getImage();
+        if (currentSprite == null) {
+            currentImage = null;
+        } else {
+            currentImage = currentSprite.getImage();
+        }
     }
 
     private void setSprite(int index) {
         currentSprite = Sprite.getSpriteFromIndex(index);
-        currentImage = currentSprite.getImage();
+        if (currentSprite == null) {
+            currentImage = null;
+        } else {
+            currentImage = currentSprite.getImage();
+        }
+        
     }
 
     public void setRotation(float degrees) {
