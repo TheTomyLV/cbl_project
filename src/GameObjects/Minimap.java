@@ -8,6 +8,7 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.List;
 import java.util.ArrayList;
 
 /**
@@ -39,9 +40,9 @@ public class Minimap extends GameObject {
 
 
 
-        ArrayList<GameObject> playersLocal  = scene.getObjectsOfClass(Player.class);
-        ArrayList<GameObject> playersRemote = scene.getServerObjectOfClass(Player.class);
-        ArrayList<GameObject> enemies       = scene.getServerObjectOfClass(Enemy.class);
+        List<GameObject> playersLocal  = scene.getObjectsOfClass(Player.class);
+        List<GameObject> playersRemote = scene.getServerObjectOfClass(Player.class);
+        List<GameObject> enemies       = scene.getServerObjectOfClass(Enemy.class);
 
         ArrayList<Vector2> playerPositions = new ArrayList<>();
         for (GameObject go : playersLocal) {

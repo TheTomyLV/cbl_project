@@ -11,6 +11,7 @@ import Engine.Sound.AudioPlayer;
 import Engine.Vector2;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A player gameObject.
@@ -76,7 +77,7 @@ public class Player extends GameObject {
      */
     @NetEvent("player_hit")
     public static void hit(int damage) {
-        ArrayList<GameObject> players = Engine.getCurrentScene().getObjectsOfClass(Player.class);
+        List<GameObject> players = Engine.getCurrentScene().getObjectsOfClass(Player.class);
         Player player;
         if (players.size() == 0) {
             return;
@@ -100,7 +101,7 @@ public class Player extends GameObject {
      */
     @NetEvent("health_pickup")
     public static void healthPickup(int health) {
-        ArrayList<GameObject> players = Engine.getCurrentScene().getObjectsOfClass(Player.class);
+        List<GameObject> players = Engine.getCurrentScene().getObjectsOfClass(Player.class);
         Player player;
         if (players.size() == 0) {
             return;

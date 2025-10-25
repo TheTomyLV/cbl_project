@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.*;
 
 /**
@@ -12,11 +14,17 @@ import javax.swing.*;
 public abstract class Scene extends JPanel {
     ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
     ArrayList<GameObject> serverObjects = new ArrayList<GameObject>();
+
+
     ArrayList<GameObject> toAddObject = new ArrayList<>();
     ArrayList<GameObject> toRemoveObject = new ArrayList<>();
 
-    ArrayList<GameObject> drawOrder = new ArrayList<>();
+    ArrayList<GameObject> toDrawOrder = new ArrayList<>();
+    ArrayList<GameObject> removeDrawOrder = new ArrayList<>();
     ArrayList<GameObject> layerChange = new ArrayList<>();
+
+    ArrayList<GameObject> drawOrder = new ArrayList<>();
+    
 
 
     /**
@@ -39,14 +47,10 @@ public abstract class Scene extends JPanel {
      * @param cls class to get
      * @return list of lical gameObjects
      */
-    public ArrayList<GameObject> getObjectsOfClass(Class<?> cls) {
-        ArrayList<GameObject> returnedObjects = new ArrayList<>();
-        for (GameObject gameObject : gameObjects) {
-            if (gameObject.isOfClass(cls)) {
-                returnedObjects.add(gameObject);
-            }
-        }
-        return returnedObjects;
+    public synchronized List<GameObject> getObjectsOfClass(Class<?> cls) {
+        return gameObjects.stream()
+            .filter(o -> o.isOfClass(cls))
+            .toList();
     }
 
     /**
@@ -54,17 +58,56 @@ public abstract class Scene extends JPanel {
      * @param cls class of gameObject
      * @return list of gameObjects
      */
-    public ArrayList<GameObject> getServerObjectOfClass(Class<?> cls) {
-        ArrayList<GameObject> returnedObjects = new ArrayList<>();
-        for (GameObject gameObject : serverObjects) {
-            if (gameObject.isOfClass(cls)) {
-                returnedObjects.add(gameObject);
+    public synchronized List<GameObject> getServerObjectOfClass(Class<?> cls) {
+        return serverObjects.stream()
+            .filter(o -> o.isOfClass(cls))
+            .toList();
+    }
+
+    // Should be implemented with binary search
+    private void layerChange() {
+        for (int i = 0; i < layerChange.size(); i++) {
+            GameObject gameObject = layerChange.get(i);
+            if (!drawOrder.contains(gameObject)) {
+                continue;
+            }
+            if (gameObject == null) {
+                continue;
+            }
+
+            boolean added = false;
+            for (int j = 0; j < drawOrder.size(); j++) {
+                GameObject other = drawOrder.get(j);
+                if (gameObject.getLayer() <= other.getLayer()) {
+                    drawOrder.remove(gameObject);
+                    drawOrder.add(j, gameObject);
+                    added = true;
+                    break;
+                }
+            }
+            if (!added) {
+                drawOrder.remove(gameObject);
+                drawOrder.add(gameObject);
             }
         }
-        return returnedObjects;
+
+        layerChange = new ArrayList<>();
     }
 
     private void draw(Graphics g) {
+        for (GameObject gameObject : toDrawOrder) {
+            if (!drawOrder.contains(gameObject)) {
+                drawOrder.add(gameObject);
+            }
+        }
+        toDrawOrder.clear();
+
+        for (GameObject gameObject : removeDrawOrder) {
+            if (drawOrder.contains(gameObject)) {
+                drawOrder.remove(gameObject);
+            }
+        }
+        removeDrawOrder.clear();
         layerChange();
         for (int i = 0; i < drawOrder.size(); i++) {
             if (drawOrder.get(i) == null) {
@@ -101,7 +144,7 @@ public abstract class Scene extends JPanel {
             if (!gameObjects.contains(gameObject)) {
                 gameObject.setLayer(gameObject.getLayer());
                 gameObjects.add(gameObject);
-                drawOrder.add(gameObject);
+                addDrawOrder(gameObject);
             }
         }
         toAddObject.clear();
@@ -110,7 +153,7 @@ public abstract class Scene extends JPanel {
             if (gameObjects.contains(gameObject)) {
                 gameObject.onDestroy();
                 gameObjects.remove(gameObject);
-                drawOrder.remove(gameObject);
+                removeDrawOrder(gameObject);
             }
         }
         toRemoveObject.clear();
@@ -120,7 +163,7 @@ public abstract class Scene extends JPanel {
 
     public abstract void setupScene();
 
-    private void addToLayerChange(GameObject gameObject) {
+    private synchronized void addToLayerChange(GameObject gameObject) {
         if (layerChange.contains(gameObject)) {
             return;
         }
@@ -129,44 +172,31 @@ public abstract class Scene extends JPanel {
     }
 
 
-    // Should be implemented with binary search
-    private void layerChange() {
-        for (int i = 0; i < layerChange.size(); i++) {
-            GameObject gameObject = layerChange.get(i);
-            if (!drawOrder.contains(gameObject)) {
-                continue;
-            }
-            if (gameObject == null) {
-                continue;
-            }
+    private synchronized void addDrawOrder(GameObject gameObject) {
+        toDrawOrder.add(gameObject);
+    }
 
-            boolean added = false;
-            for (int j = 0; j < drawOrder.size(); j++) {
-                GameObject other = drawOrder.get(j);
-                if (gameObject.getLayer() <= other.getLayer()) {
-                    drawOrder.remove(gameObject);
-                    drawOrder.add(j, gameObject);
-                    added = true;
-                    break;
-                }
-            }
-            if (!added) {
-                drawOrder.remove(gameObject);
-                drawOrder.add(gameObject);
-            }
-        }
-
-        layerChange = new ArrayList<>();
+    private synchronized void removeDrawOrder(GameObject gameObject) {
+        removeDrawOrder.add(gameObject);
     }
 
     /**
      * Add a gameObject to scene.
      * @param gameObject object to add
      */
-    public void addObject(GameObject gameObject) {
+    public synchronized void addObject(GameObject gameObject) {
         gameObject.setOwnerUUID(Engine.getClient().getClientId());
         toAddObject.add(gameObject);
     }
+
+    /**
+     * Internal method for destroying scene gameObjects.
+     * @param gameObject gameObject that is scene
+     */
+    synchronized void destroyObject(GameObject gameObject) {
+        toRemoveObject.add(gameObject);
+    }
+
 
     /**
      * Adds an object that is received from the server.
@@ -177,16 +207,8 @@ public abstract class Scene extends JPanel {
             return;
         }
         gameObject.setLayer(gameObject.getLayer());
-        drawOrder.add(gameObject);
         serverObjects.add(gameObject);
-    }
-
-    /**
-     * Internal method for destroying scene gameObjects.
-     * @param gameObject gameObject that is scene
-     */
-    void destroyObject(GameObject gameObject) {
-        toRemoveObject.add(gameObject);
+        addDrawOrder(gameObject);
     }
 
     /**
@@ -195,7 +217,7 @@ public abstract class Scene extends JPanel {
      */
     protected void destroyServerObject(GameObject gameObject) {
         if (serverObjects.contains(gameObject)) {
-            drawOrder.remove(gameObject);
+            removeDrawOrder(gameObject);
             gameObject.onDestroy();
             serverObjects.remove(gameObject);
         }
@@ -208,6 +230,4 @@ public abstract class Scene extends JPanel {
     protected ArrayList<GameObject> getServerObject() {
         return serverObjects;
     }
-
-
 }
